@@ -3,7 +3,10 @@
 export type OnboardingStep =
   | 'email'
   | 'email_verification'
+  | 'identity'
   | 'passport'
+  | 'kyc_review'
+  | 'kyc_rejected'
   | 'tos'
   | 'funding'
   | 'funding_crypto'

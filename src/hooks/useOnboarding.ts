@@ -5,6 +5,14 @@ type OnboardingPhase = 'idle' | OnboardingStep
 
 export interface OnboardingData {
   email: string
+  firstName: string
+  lastName: string
+  dateOfBirth: string
+  phone: string
+  addressLine: string
+  city: string
+  postalCode: string
+  country: string
   fundingStream: FundingStream | null
   fiatMethod: FiatMethod | null
   cardTier: CardTier | null
@@ -18,6 +26,7 @@ interface OnboardingState {
 const STEP_SEQUENCE: OnboardingStep[] = [
   'email',
   'email_verification',
+  'identity',
   'passport',
   'tos',
   'funding',
@@ -26,6 +35,14 @@ const STEP_SEQUENCE: OnboardingStep[] = [
 
 const INITIAL_DATA: OnboardingData = {
   email: '',
+  firstName: '',
+  lastName: '',
+  dateOfBirth: '',
+  phone: '',
+  addressLine: '',
+  city: '',
+  postalCode: '',
+  country: 'ES',
   fundingStream: null,
   fiatMethod: null,
   cardTier: null,
@@ -46,7 +63,8 @@ function persist(state: OnboardingState) {
 }
 
 const VALID_PHASES = new Set([
-  'email', 'email_verification', 'passport', 'tos',
+  'email', 'email_verification', 'identity', 'passport',
+  'kyc_review', 'kyc_rejected', 'tos',
   'funding', 'funding_crypto', 'funding_fiat', 'processing',
   'card_selection', 'completing',
 ])
@@ -95,6 +113,11 @@ export function useOnboarding() {
   const back = useCallback(() => {
     setState(prev => {
       const step = prev.phase as OnboardingStep
+      if (step === 'kyc_rejected') {
+        const next = { phase: 'passport' as OnboardingPhase, data: prev.data }
+        persist(next)
+        return next
+      }
       if (step === 'funding_crypto' || step === 'funding_fiat') {
         const next = { phase: 'funding' as OnboardingPhase, data: prev.data }
         persist(next)

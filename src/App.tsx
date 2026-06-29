@@ -68,7 +68,7 @@ export default function App() {
     <MobileShell>
       <div className="app-layer">
         {onboarding.isComplete ? (
-          <HomeScreen key="home" />
+          <HomeScreen key="home" onReset={onboarding.reset} />
         ) : onboarding.isActive ? (
           <OnboardingFlow
             key="flow"

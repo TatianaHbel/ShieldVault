@@ -2551,6 +2551,32 @@
 .onb-input:focus { border-color: var(--color-primary); }
 .onb-input::placeholder { color: var(--color-text-muted); }
 
+.onb-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+}
+
+.onb-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 40px;
+}
+
+.onb-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.onb-row .onb-input-group {
+  margin-bottom: 16px;
+}
+
 /* ── Divider ───────────────────────────── */
 
 .onb-divider {
@@ -3496,4 +3522,22 @@
   font-family: var(--font-body);
   line-height: 1.5;
   max-width: 240px;
+}
+
+.hs-reset-btn {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: var(--radius-full);
+  transition: color var(--duration-fast), background var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hs-reset-btn:active {
+  color: var(--color-text-secondary);
+  background: var(--color-surface-subtle);
 }

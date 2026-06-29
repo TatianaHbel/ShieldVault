@@ -19,7 +19,7 @@ const SLIDE = {
   transition: { type: 'spring' as const, damping: 28, stiffness: 320, mass: 0.8 },
 }
 
-const STEP_ORDER = ['email', 'email_verification', 'passport', 'tos', 'funding', 'card_selection']
+const STEP_ORDER = ['email', 'email_verification', 'identity', 'passport', 'tos', 'funding', 'card_selection']
 const TOTAL_STEPS = STEP_ORDER.length
 
 function stepNumber(phase: string): number {
@@ -217,7 +217,204 @@ function StepEmailVerification({
   )
 }
 
-// ── Step 3: Passport / KYC ──────────────────────────────────────
+// ── Step 3: Identity ────────────────────────────────────────────
+
+const EU_COUNTRIES = [
+  { code: 'AT', name: 'Austria' }, { code: 'BE', name: 'Belgium' },
+  { code: 'HR', name: 'Croatia' }, { code: 'CY', name: 'Cyprus' },
+  { code: 'CZ', name: 'Czech Republic' }, { code: 'DK', name: 'Denmark' },
+  { code: 'EE', name: 'Estonia' }, { code: 'FI', name: 'Finland' },
+  { code: 'FR', name: 'France' }, { code: 'DE', name: 'Germany' },
+  { code: 'GR', name: 'Greece' }, { code: 'HU', name: 'Hungary' },
+  { code: 'IE', name: 'Ireland' }, { code: 'IT', name: 'Italy' },
+  { code: 'LV', name: 'Latvia' }, { code: 'LT', name: 'Lithuania' },
+  { code: 'LU', name: 'Luxembourg' }, { code: 'MT', name: 'Malta' },
+  { code: 'NL', name: 'Netherlands' }, { code: 'PL', name: 'Poland' },
+  { code: 'PT', name: 'Portugal' }, { code: 'RO', name: 'Romania' },
+  { code: 'SK', name: 'Slovakia' }, { code: 'SI', name: 'Slovenia' },
+  { code: 'ES', name: 'Spain' }, { code: 'SE', name: 'Sweden' },
+]
+
+function StepIdentity({
+  data,
+  onNext,
+  onBack,
+}: {
+  data: OnboardingData
+  onNext: (patch: Partial<OnboardingData>) => void
+  onBack: () => void
+}) {
+  const [form, setForm] = useState({
+    firstName:   data.firstName   || '',
+    lastName:    data.lastName    || '',
+    dateOfBirth: data.dateOfBirth || '',
+    phone:       data.phone       || '',
+    addressLine: data.addressLine || '',
+    city:        data.city        || '',
+    postalCode:  data.postalCode  || '',
+    country:     data.country     || 'ES',
+  })
+
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const canContinue =
+    form.firstName.trim() && form.lastName.trim() && form.dateOfBirth &&
+    form.phone.trim() && form.addressLine.trim() && form.city.trim() && form.postalCode.trim()
+
+  return (
+    <motion.div className="onb-screen" {...SLIDE}>
+      <OnbHeader phase="identity" onBack={onBack} />
+      <div className="onb-body">
+        <h2 className="onb-title">Tell us about yourself</h2>
+        <p className="onb-sub">Required by EU financial regulations to open your account.</p>
+
+        <div className="onb-row">
+          <div className="onb-input-group" style={{ flex: 1 }}>
+            <label className="onb-label">First name</label>
+            <input className="onb-input" type="text" placeholder="Maria" value={form.firstName} onChange={set('firstName')} autoComplete="given-name" />
+          </div>
+          <div className="onb-input-group" style={{ flex: 1 }}>
+            <label className="onb-label">Last name</label>
+            <input className="onb-input" type="text" placeholder="Garcia" value={form.lastName} onChange={set('lastName')} autoComplete="family-name" />
+          </div>
+        </div>
+
+        <div className="onb-input-group">
+          <label className="onb-label">Date of birth</label>
+          <input className="onb-input" type="date" value={form.dateOfBirth} onChange={set('dateOfBirth')} autoComplete="bday" />
+        </div>
+
+        <div className="onb-input-group">
+          <label className="onb-label">Phone number</label>
+          <input className="onb-input" type="tel" inputMode="tel" placeholder="+34 600 000 000" value={form.phone} onChange={set('phone')} autoComplete="tel" />
+        </div>
+
+        <div className="onb-input-group">
+          <label className="onb-label">Street address</label>
+          <input className="onb-input" type="text" placeholder="Calle Mayor 12, 3A" value={form.addressLine} onChange={set('addressLine')} autoComplete="street-address" />
+        </div>
+
+        <div className="onb-row">
+          <div className="onb-input-group" style={{ flex: 1 }}>
+            <label className="onb-label">City</label>
+            <input className="onb-input" type="text" placeholder="Madrid" value={form.city} onChange={set('city')} autoComplete="address-level2" />
+          </div>
+          <div className="onb-input-group" style={{ width: 110, flexShrink: 0 }}>
+            <label className="onb-label">Postal code</label>
+            <input className="onb-input" type="text" inputMode="numeric" placeholder="28001" value={form.postalCode} onChange={set('postalCode')} autoComplete="postal-code" />
+          </div>
+        </div>
+
+        <div className="onb-input-group">
+          <label className="onb-label">Country</label>
+          <select className="onb-input onb-select" value={form.country} onChange={set('country')} autoComplete="country">
+            {EU_COUNTRIES.map(c => (
+              <option key={c.code} value={c.code}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+      <div className="onb-footer">
+        <Button
+          variant="primary"
+          size="lg"
+          style={{ width: '100%' }}
+          disabled={!canContinue}
+          onClick={() => onNext(form)}
+        >
+          Continue
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Step 5: KYC review ──────────────────────────────────────────
+
+function StepKycReview({ onApproved, onRejected }: { onApproved: () => void; onRejected: () => void }) {
+  const [status, setStatus] = useState<'reviewing' | 'approved'>('reviewing')
+
+  useEffect(() => {
+    const t1 = setTimeout(() => setStatus('approved'), 3500)
+    const t2 = setTimeout(onApproved, 4600)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [onApproved, onRejected])
+
+  return (
+    <motion.div
+      className="onb-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="onb-processing">
+        {status === 'reviewing' ? (
+          <>
+            <div className="onb-processing__spinner" />
+            <div className="onb-processing__title">Verifying your identity</div>
+            <div className="onb-processing__sub">
+              Our partner is reviewing your document. This usually takes a few seconds.
+              You can close the app and we will notify you when verification is complete.
+            </div>
+          </>
+        ) : (
+          <>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: 'spring', damping: 14, stiffness: 260 }}
+              style={{
+                width: 56, height: 56, borderRadius: '50%',
+                background: 'var(--color-success)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 16px',
+              }}
+            >
+              <Check size={26} color="white" />
+            </motion.div>
+            <div className="onb-processing__title">Identity verified</div>
+            <div className="onb-processing__sub">Your documents have been approved.</div>
+          </>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Step 5b: KYC rejected ───────────────────────────────────────
+
+function StepKycRejected({ onRetry }: { onRetry: () => void }) {
+  return (
+    <motion.div className="onb-screen" {...SLIDE}>
+      <div className="onb-body" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, textAlign: 'center', padding: '32px 24px' }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: '50%',
+          background: 'rgba(220,38,38,0.1)',
+          border: '1px solid rgba(220,38,38,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          margin: '0 auto 20px',
+        }}>
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24">
+            <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </div>
+        <h2 className="onb-title" style={{ marginBottom: 10 }}>Verification unsuccessful</h2>
+        <p className="onb-sub" style={{ marginBottom: 0 }}>
+          We could not verify your identity with the document provided. Please try again with a clearer photo where all four corners are visible and there is no glare.
+        </p>
+      </div>
+      <div className="onb-footer">
+        <Button variant="primary" size="lg" style={{ width: '100%' }} onClick={onRetry}>
+          Try again
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Step 4: Passport / KYC ──────────────────────────────────────
 
 function StepPassport({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   const [uploaded, setUploaded] = useState(false)
@@ -718,15 +915,36 @@ export function OnboardingFlow({ phase, data, advance, back }: OnboardingFlowPro
           <StepEmailVerification
             key="email_verification"
             email={data.email}
-            onNext={() => advance('passport')}
+            onNext={() => advance('identity')}
+            onBack={back}
+          />
+        )}
+        {phase === 'identity' && (
+          <StepIdentity
+            key="identity"
+            data={data}
+            onNext={patch => advance('passport', patch)}
             onBack={back}
           />
         )}
         {phase === 'passport' && (
           <StepPassport
             key="passport"
-            onNext={() => advance('tos')}
+            onNext={() => advance('kyc_review')}
             onBack={back}
+          />
+        )}
+        {phase === 'kyc_review' && (
+          <StepKycReview
+            key="kyc_review"
+            onApproved={() => advance('tos')}
+            onRejected={() => advance('kyc_rejected')}
+          />
+        )}
+        {phase === 'kyc_rejected' && (
+          <StepKycRejected
+            key="kyc_rejected"
+            onRetry={back}
           />
         )}
         {phase === 'tos' && (

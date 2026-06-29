@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ShieldCheck, ShieldOff, Send, Download, Settings, Home, TrendingUp, CreditCard, User } from 'lucide-react'
 
-export function HomeScreen() {
+export function HomeScreen({ onReset }: { onReset?: () => void }) {
   const [activeTab, setActiveTab] = useState<'home' | 'earn' | 'cards' | 'account'>('home')
 
   return (
@@ -70,7 +70,7 @@ export function HomeScreen() {
         </div>
 
         {/* Recent activity */}
-        <div className="hs-section">
+        <div className="hs-section" style={{ paddingBottom: 8 }}>
           <div className="hs-section-header">
             <span className="hs-section-title">Recent activity</span>
           </div>
@@ -84,6 +84,15 @@ export function HomeScreen() {
             </div>
           </div>
         </div>
+
+        {/* Demo reset */}
+        {onReset && (
+          <div style={{ padding: '8px 16px 0', textAlign: 'center' }}>
+            <button className="hs-reset-btn" onClick={onReset}>
+              Restart onboarding demo
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Bottom nav with FAB */}
