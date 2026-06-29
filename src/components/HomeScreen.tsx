@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  ShieldCheck, ShieldOff, Send, Download,
+  Send, Download,
   Settings, Home, TrendingUp, CreditCard, User,
   Check, ChevronRight,
 } from 'lucide-react'
@@ -130,53 +130,36 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
       {/* Scrollable content */}
       <div className="hs-scroll">
 
-        {/* Balance card */}
+        {/* Balance — flat, no card */}
         <div className="hs-balance-section">
-          <div className="hs-balance-card">
-            <div className="hs-balance-card__label">Available balance</div>
-            <div className="hs-balance-card__amount">$50.00</div>
-            {activeProvider && (
-              <motion.div
-                className="hs-apy-badge"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3, ease: 'easeOut' }}
-              >
-                <TrendingUp size={13} />
-                <span>Earning {activeProvider.apy}% APY</span>
-              </motion.div>
-            )}
+          <div className="hs-balance-label">Available balance</div>
+          <div className="hs-balance-amount">
+            50.00
+            <span className="hs-balance-unit">USDC</span>
           </div>
+          {activeProvider && (
+            <motion.div
+              className="hs-apy-badge"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <TrendingUp size={13} />
+              <span>Earning {activeProvider.apy}% APY</span>
+            </motion.div>
+          )}
         </div>
 
-        {/* Action grid */}
-        <div className="hs-actions">
-          <div className="action-grid action-grid--quad">
-            <button className="action-btn action-btn--framed">
-              <div className="action-icon-lg action-icon-lg--primary">
-                <ShieldCheck size={22} />
-              </div>
-              Shield
-            </button>
-            <button className="action-btn action-btn--framed">
-              <div className="action-icon-lg action-icon-lg--muted">
-                <ShieldOff size={22} />
-              </div>
-              Unshield
-            </button>
-            <button className="action-btn action-btn--framed">
-              <div className="action-icon-lg action-icon-lg--muted">
-                <Send size={22} />
-              </div>
-              Send
-            </button>
-            <button className="action-btn action-btn--framed">
-              <div className="action-icon-lg action-icon-lg--muted">
-                <Download size={22} />
-              </div>
-              Receive
-            </button>
-          </div>
+        {/* Actions — pill buttons only */}
+        <div className="hs-action-pills">
+          <button className="hs-pill hs-pill--primary">
+            <Send size={15} />
+            Send
+          </button>
+          <button className="hs-pill hs-pill--ghost">
+            <Download size={15} />
+            Receive
+          </button>
         </div>
 
         {/* Yield section */}
@@ -229,7 +212,7 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
                     Your balance is not earning yet
                   </div>
                   <div className="hs-yield-empty__sub">
-                    Choose a provider and your $50 starts growing automatically. Up to 6.2% APY.
+                    Choose a provider and your 50 USDC starts growing automatically. Up to 6.2% APY.
                   </div>
                 </div>
                 <button
@@ -244,19 +227,14 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
           </AnimatePresence>
         </div>
 
-        {/* Recent activity */}
+        {/* Recent activity — flat, no card */}
         <div className="hs-section" style={{ paddingBottom: 8 }}>
           <div className="hs-section-header">
             <span className="hs-section-title">Recent activity</span>
           </div>
-          <div className="hs-activity-empty">
-            <div className="hs-activity-empty__icon">
-              <TrendingUp size={28} style={{ color: 'var(--color-primary)' }} />
-            </div>
-            <div className="hs-activity-empty__title">No transactions yet</div>
-            <div className="hs-activity-empty__sub">
-              Add money or send to get started.
-            </div>
+          <div className="hs-activity-flat">
+            <div className="hs-activity-flat__msg">No transactions yet</div>
+            <div className="hs-activity-flat__hint">Add money or send to get started.</div>
           </div>
         </div>
 
@@ -272,7 +250,7 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
       </div>
 
       {/* Bottom nav */}
-      <nav className="bottom-nav bottom-nav--fab">
+      <nav className="bottom-nav">
         <button
           className={`bottom-nav__tab${activeTab === 'home' ? ' bottom-nav__tab--active' : ''}`}
           onClick={() => setActiveTab('home')}
@@ -287,7 +265,6 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
           <TrendingUp size={22} />
           Earn
         </button>
-        <div className="bottom-nav__fab-slot" />
         <button
           className={`bottom-nav__tab${activeTab === 'cards' ? ' bottom-nav__tab--active' : ''}`}
           onClick={() => setActiveTab('cards')}
@@ -301,10 +278,6 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
         >
           <User size={22} />
           Account
-        </button>
-        <button className="bottom-nav__fab" aria-label="Shield">
-          <ShieldCheck size={26} color="white" />
-          <span className="bottom-nav__fab-label">Shield</span>
         </button>
       </nav>
 

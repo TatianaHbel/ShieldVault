@@ -3569,17 +3569,14 @@
   color: var(--color-text-secondary);
   font-family: var(--font-body);
   line-height: 1.5;
-  margin: 0 0 32px;
+  margin: 24px 0 0;
   max-width: 280px;
 }
 
 .onb-completed__balance-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-2xl);
   padding: 22px 24px;
   width: 100%;
-  text-align: left;
+  text-align: center;
   box-sizing: border-box;
 }
 
@@ -3601,6 +3598,14 @@
   font-family: var(--font-body);
   line-height: 1;
   font-variant-numeric: tabular-nums;
+}
+
+.onb-completed__balance-currency {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-muted);
+  vertical-align: middle;
 }
 
 .onb-completed__balance-yield {
@@ -3685,24 +3690,15 @@
   padding: 8px 16px 0;
 }
 
-.hs-balance-card {
-  background: var(--color-surface-card);
-  border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-2xl);
-  padding: 22px;
-}
-
-.hs-balance-card__label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.hs-balance-label {
+  font-size: 13px;
+  font-weight: 500;
   color: var(--color-muted);
   font-family: var(--font-body);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.hs-balance-card__amount {
+.hs-balance-amount {
   font-size: 40px;
   font-weight: 700;
   color: var(--color-ink);
@@ -3711,6 +3707,16 @@
   line-height: 1;
   margin-bottom: 12px;
   font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hs-balance-unit {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-muted);
+  letter-spacing: 0.02em;
 }
 
 .hs-apy-badge {
@@ -3727,16 +3733,47 @@
   font-family: var(--font-body);
 }
 
-/* ── Actions section ───────────────────── */
+/* ── Action pill buttons ───────────────── */
 
-.hs-actions {
-  padding: 16px 16px 4px;
+.hs-action-pills {
+  padding: 4px 16px 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.hs-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--duration-fast);
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: -0.01em;
+}
+
+.hs-pill:active { opacity: 0.75; }
+
+.hs-pill--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.hs-pill--ghost {
+  background: var(--color-surface-elevated);
+  color: var(--color-body-strong);
+  border: 1px solid var(--color-hairline-strong);
 }
 
 /* ── Generic section ───────────────────── */
 
 .hs-section {
-  padding: 16px 16px 0;
+  padding: 16px 20px 0;
 }
 
 .hs-section-header {
@@ -3754,44 +3791,24 @@
   letter-spacing: -0.01em;
 }
 
-/* ── Activity empty state ──────────────── */
+/* ── Activity flat empty state ─────────── */
 
-.hs-activity-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 28px 24px;
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  gap: 8px;
+.hs-activity-flat {
+  padding: 4px 0 8px;
 }
 
-.hs-activity-empty__icon {
-  width: 52px;
-  height: 52px;
-  background: var(--color-surface-elevated);
-  border-radius: var(--radius-lg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
-}
-
-.hs-activity-empty__title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--color-text-primary);
+.hs-activity-flat__msg {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-muted);
   font-family: var(--font-body);
 }
 
-.hs-activity-empty__sub {
+.hs-activity-flat__hint {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: var(--color-muted-soft);
   font-family: var(--font-body);
-  line-height: 1.5;
-  max-width: 240px;
+  margin-top: 3px;
 }
 
 .hs-reset-btn {

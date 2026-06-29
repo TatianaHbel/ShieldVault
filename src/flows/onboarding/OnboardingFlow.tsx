@@ -1092,9 +1092,6 @@ function StepCompleting({ onDone }: { onDone: () => void }) {
           <ShieldCheck size={34} color="white" />
         </motion.div>
         <h2 className="onb-completed__title">{"You're all set"}</h2>
-        <p className="onb-completed__sub">
-          Your account is active and your balance is ready to use.
-        </p>
         <motion.div
           className="onb-completed__balance-card"
           initial={{ opacity: 0, y: 20 }}
@@ -1102,12 +1099,13 @@ function StepCompleting({ onDone }: { onDone: () => void }) {
           transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
         >
           <div className="onb-completed__balance-label">Available balance</div>
-          <div className="onb-completed__balance-amount">$50.00</div>
-          <div className="onb-completed__balance-yield">
-            <TrendingUp size={13} style={{ flexShrink: 0 }} />
-            <span>Earning 4.2% APY</span>
+          <div className="onb-completed__balance-amount">
+            50.00 <span className="onb-completed__balance-currency">USDC</span>
           </div>
         </motion.div>
+        <p className="onb-completed__sub">
+          Your account is active and your balance is ready to use.
+        </p>
       </div>
       <div className="onb-footer">
         <Button variant="primary" size="lg" style={{ width: '100%' }} onClick={onDone}>
