@@ -768,32 +768,27 @@ function StepFunding({
     <motion.div className="onb-screen" {...SLIDE}>
       <OnbHeader phase="funding" onBack={onBack} />
       <div className="onb-body">
-        <h2 className="onb-title">Fund your account</h2>
-        <p className="onb-sub">Transfer at least $50 to activate your account.</p>
-        <div className="onb-yield-card">
-          <div className="onb-yield-card__icon">
-            <TrendingUp size={20} />
+        <h2 className="onb-title">Deposit to activate</h2>
+        <p className="onb-sub">
+          Your $50 goes straight to your balance. {"It's"} a deposit, not a fee.
+          Once {"you're"} in, you choose how it grows.
+        </p>
+
+        {/* Yield teaser — invitation, not explanation */}
+        <div className="onb-yield-teaser">
+          <div className="onb-yield-teaser__icon">
+            <TrendingUp size={16} />
           </div>
-          <div className="onb-yield-card__label">Auto-yield</div>
-          <div className="onb-yield-card__apy">4.2% APY</div>
-          <div className="onb-yield-card__desc">
-            Every dollar you deposit earns yield automatically. Your balance grows while you pay, send, and spend. No action needed.
+          <div className="onb-yield-teaser__body">
+            <div className="onb-yield-teaser__line">
+              Your balance can earn <strong>up to 6.2% APY</strong>
+            </div>
+            <div className="onb-yield-teaser__sub">
+              You choose your provider once {"you're"} inside
+            </div>
           </div>
-          <ul className="onb-yield-card__perks">
-            <li className="onb-yield-card__perk">
-              <Check size={13} style={{ flexShrink: 0, color: 'var(--color-yield)' }} />
-              <span>Powered by AAVE, a leading lending protocol</span>
-            </li>
-            <li className="onb-yield-card__perk">
-              <Check size={13} style={{ flexShrink: 0, color: 'var(--color-yield)' }} />
-              <span>Yield credited to your balance every month</span>
-            </li>
-            <li className="onb-yield-card__perk">
-              <Check size={13} style={{ flexShrink: 0, color: 'var(--color-yield)' }} />
-              <span>Withdraw or spend anytime, no lockup period</span>
-            </li>
-          </ul>
         </div>
+
         <div className="onb-choices">
           <button className="onb-choice-card" onClick={onCrypto}>
             <div className="onb-choice-icon">
@@ -804,7 +799,7 @@ function StepFunding({
             </div>
             <div className="onb-choice-body">
               <div className="onb-choice-title">Send crypto</div>
-              <div className="onb-choice-sub">Transfer USDC or any other crypto</div>
+              <div className="onb-choice-sub">Deposit USDC or any other crypto</div>
             </div>
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -819,8 +814,8 @@ function StepFunding({
               </svg>
             </div>
             <div className="onb-choice-body">
-              <div className="onb-choice-title">Bank or card</div>
-              <div className="onb-choice-sub">Bank transfer or credit card</div>
+              <div className="onb-choice-title">Bank transfer or card</div>
+              <div className="onb-choice-sub">Bank transfer, debit card, or Apple Pay</div>
             </div>
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

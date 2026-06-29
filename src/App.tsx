@@ -1,20 +1,27 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { MobileShell } from './components/MobileShell'
 import { HomeScreen } from './components/HomeScreen'
 import { Button } from './components/Button'
 import { useOnboarding } from './hooks/useOnboarding'
 import { OnboardingFlow } from './flows/onboarding/OnboardingFlow'
+import { GameOnboardingFlow } from './flows/onboarding/GameOnboardingFlow'
 import './App.css'
+import './styles/game-mode.css'
 
-function LandingScreen({ onStart }: { onStart: () => void }) {
+function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMode: () => void }) {
   return (
     <motion.div
       className="landing-screen"
+      style={{ position: 'relative' }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
+      <button className="gm-trigger" onClick={onGameMode} aria-label="">
+        {'◈'}
+      </button>
       <div className="landing-hero">
         <div className="landing-logo">ShieldVault</div>
         <div className="landing-tagline">
@@ -63,12 +70,25 @@ function LandingScreen({ onStart }: { onStart: () => void }) {
 
 export default function App() {
   const onboarding = useOnboarding()
+  const [gameMode, setGameMode] = useState(false)
+
+  const handleGameComplete = () => {
+    setGameMode(false)
+    onboarding.advance('completed')
+  }
+
+  const handleReset = () => {
+    setGameMode(false)
+    onboarding.reset()
+  }
 
   return (
     <MobileShell>
       <div className="app-layer">
         {onboarding.isComplete ? (
-          <HomeScreen key="home" onReset={onboarding.reset} />
+          <HomeScreen key="home" onReset={handleReset} />
+        ) : gameMode ? (
+          <GameOnboardingFlow key="game" onComplete={handleGameComplete} />
         ) : onboarding.isActive ? (
           <OnboardingFlow
             key="flow"
@@ -78,7 +98,11 @@ export default function App() {
             back={onboarding.back}
           />
         ) : (
-          <LandingScreen key="landing" onStart={onboarding.start} />
+          <LandingScreen
+            key="landing"
+            onStart={onboarding.start}
+            onGameMode={() => setGameMode(true)}
+          />
         )}
       </div>
     </MobileShell>

@@ -1017,10 +1017,33 @@ export function UseCase() {
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>02</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Onboarding phases</h2>
             </div>
-            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
+            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 28px', lineHeight: 1.7 }}>
               The onboarding state machine has a single happy path from registration to a funded,
               active account. The $50 minimum deposit requirement gates access to card selection.
             </p>
+
+            {/* Presenter note */}
+            <div style={{
+              background: 'rgba(245,158,11,0.06)',
+              border: '1px dashed rgba(245,158,11,0.35)',
+              borderRadius: 10,
+              padding: '16px 20px',
+              marginBottom: 32,
+              fontFamily: 'Inter, sans-serif',
+            }}>
+              <div style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#F59E0B', marginBottom: 8 }}>
+                Presenter note
+              </div>
+              <p style={{ margin: 0, fontSize: 14, color: 'var(--color-body)', lineHeight: 1.7 }}>
+                This prototype collects all identity fields upfront (name, date of birth, full address).
+                The production intent is <strong style={{ color: 'var(--color-ink)' }}>progressive KYC</strong>:
+                collect only email and name at signup, then request address and further identity details
+                only when a user crosses a transaction threshold (e.g. sending more than $500 in a single
+                transfer or $1,000 cumulative). This reduces drop-off during onboarding while remaining
+                compliant with tiered AML/KYC regulations.
+              </p>
+            </div>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
               {[
                 ['email', 'user'], ['email_verification', 'user'], ['identity', 'user'],
