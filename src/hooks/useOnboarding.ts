@@ -8,7 +8,6 @@ export interface OnboardingData {
   firstName: string
   lastName: string
   dateOfBirth: string
-  phone: string
   addressLine: string
   city: string
   postalCode: string
@@ -26,7 +25,9 @@ interface OnboardingState {
 const STEP_SEQUENCE: OnboardingStep[] = [
   'email',
   'email_verification',
-  'identity',
+  'identity_name',
+  'identity_dob',
+  'identity_address',
   'passport',
   'tos',
   'funding',
@@ -38,7 +39,6 @@ const INITIAL_DATA: OnboardingData = {
   firstName: '',
   lastName: '',
   dateOfBirth: '',
-  phone: '',
   addressLine: '',
   city: '',
   postalCode: '',
@@ -63,8 +63,9 @@ function persist(state: OnboardingState) {
 }
 
 const VALID_PHASES = new Set([
-  'email', 'email_verification', 'identity', 'passport',
-  'kyc_review', 'kyc_rejected', 'tos',
+  'email', 'email_verification',
+  'identity_name', 'identity_dob', 'identity_address',
+  'passport', 'kyc_review', 'kyc_rejected', 'tos',
   'funding', 'funding_crypto', 'funding_fiat', 'processing',
   'card_selection', 'completing',
 ])

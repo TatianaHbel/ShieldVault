@@ -19,7 +19,7 @@ const SLIDE = {
   transition: { type: 'spring' as const, damping: 28, stiffness: 320, mass: 0.8 },
 }
 
-const STEP_ORDER = ['email', 'email_verification', 'identity', 'passport', 'tos', 'funding', 'card_selection']
+const STEP_ORDER = ['email', 'email_verification', 'identity_name', 'identity_dob', 'identity_address', 'passport', 'tos', 'funding', 'card_selection']
 const TOTAL_STEPS = STEP_ORDER.length
 
 function stepNumber(phase: string): number {
@@ -217,7 +217,113 @@ function StepEmailVerification({
   )
 }
 
-// ── Step 3: Identity ────────────────────────────────────────────
+// ── Step 3a: Name ───────────────────────────────────────────────
+
+function StepName({
+  data,
+  onNext,
+  onBack,
+}: {
+  data: OnboardingData
+  onNext: (patch: Partial<OnboardingData>) => void
+  onBack: () => void
+}) {
+  const [firstName, setFirstName] = useState(data.firstName)
+  const [lastName, setLastName] = useState(data.lastName)
+  const canContinue = firstName.trim().length > 0 && lastName.trim().length > 0
+
+  return (
+    <motion.div className="onb-screen" {...SLIDE}>
+      <OnbHeader phase="identity_name" onBack={onBack} />
+      <div className="onb-body">
+        <h2 className="onb-title">{"What's your name?"}</h2>
+        <p className="onb-sub">Enter your name exactly as it appears on your ID.</p>
+        <div className="onb-input-group">
+          <label className="onb-label">First name</label>
+          <input
+            className="onb-input"
+            type="text"
+            placeholder="Maria"
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
+            autoComplete="given-name"
+            autoFocus
+          />
+        </div>
+        <div className="onb-input-group">
+          <label className="onb-label">Last name</label>
+          <input
+            className="onb-input"
+            type="text"
+            placeholder="Garcia"
+            value={lastName}
+            onChange={e => setLastName(e.target.value)}
+            autoComplete="family-name"
+          />
+        </div>
+      </div>
+      <div className="onb-footer">
+        <Button
+          variant="primary"
+          size="lg"
+          style={{ width: '100%' }}
+          disabled={!canContinue}
+          onClick={() => onNext({ firstName, lastName })}
+        >
+          Continue
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Step 3b: Date of birth ──────────────────────────────────────
+
+function StepDateOfBirth({
+  data,
+  onNext,
+  onBack,
+}: {
+  data: OnboardingData
+  onNext: (patch: Partial<OnboardingData>) => void
+  onBack: () => void
+}) {
+  const [dateOfBirth, setDateOfBirth] = useState(data.dateOfBirth)
+  const canContinue = dateOfBirth.length > 0
+
+  return (
+    <motion.div className="onb-screen" {...SLIDE}>
+      <OnbHeader phase="identity_dob" onBack={onBack} />
+      <div className="onb-body">
+        <h2 className="onb-title">Date of birth</h2>
+        <p className="onb-sub">Required for identity verification. Must match your ID.</p>
+        <div className="onb-input-group">
+          <label className="onb-label">Date of birth</label>
+          <input
+            className="onb-input"
+            type="date"
+            value={dateOfBirth}
+            onChange={e => setDateOfBirth(e.target.value)}
+            autoComplete="bday"
+          />
+        </div>
+      </div>
+      <div className="onb-footer">
+        <Button
+          variant="primary"
+          size="lg"
+          style={{ width: '100%' }}
+          disabled={!canContinue}
+          onClick={() => onNext({ dateOfBirth })}
+        >
+          Continue
+        </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Step 3c: Address ────────────────────────────────────────────
 
 const EU_COUNTRIES = [
   { code: 'AT', name: 'Austria' }, { code: 'BE', name: 'Belgium' },
@@ -235,7 +341,7 @@ const EU_COUNTRIES = [
   { code: 'ES', name: 'Spain' }, { code: 'SE', name: 'Sweden' },
 ]
 
-function StepIdentity({
+function StepAddress({
   data,
   onNext,
   onBack,
@@ -245,10 +351,6 @@ function StepIdentity({
   onBack: () => void
 }) {
   const [form, setForm] = useState({
-    firstName:   data.firstName   || '',
-    lastName:    data.lastName    || '',
-    dateOfBirth: data.dateOfBirth || '',
-    phone:       data.phone       || '',
     addressLine: data.addressLine || '',
     city:        data.city        || '',
     postalCode:  data.postalCode  || '',
@@ -258,54 +360,26 @@ function StepIdentity({
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const canContinue =
-    form.firstName.trim() && form.lastName.trim() && form.dateOfBirth &&
-    form.phone.trim() && form.addressLine.trim() && form.city.trim() && form.postalCode.trim()
+  const canContinue = form.addressLine.trim() && form.city.trim() && form.postalCode.trim()
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="identity" onBack={onBack} />
+      <OnbHeader phase="identity_address" onBack={onBack} />
       <div className="onb-body">
-        <h2 className="onb-title">Tell us about yourself</h2>
-        <p className="onb-sub">Required by EU financial regulations to open your account.</p>
-
-        <div className="onb-row">
-          <div className="onb-input-group" style={{ flex: 1 }}>
-            <label className="onb-label">First name</label>
-            <input className="onb-input" type="text" placeholder="Maria" value={form.firstName} onChange={set('firstName')} autoComplete="given-name" />
-          </div>
-          <div className="onb-input-group" style={{ flex: 1 }}>
-            <label className="onb-label">Last name</label>
-            <input className="onb-input" type="text" placeholder="Garcia" value={form.lastName} onChange={set('lastName')} autoComplete="family-name" />
-          </div>
-        </div>
-
-        <div className="onb-input-group">
-          <label className="onb-label">Date of birth</label>
-          <input className="onb-input" type="date" value={form.dateOfBirth} onChange={set('dateOfBirth')} autoComplete="bday" />
-        </div>
-
-        <div className="onb-input-group">
-          <label className="onb-label">Phone number</label>
-          <input className="onb-input" type="tel" inputMode="tel" placeholder="+34 600 000 000" value={form.phone} onChange={set('phone')} autoComplete="tel" />
-        </div>
-
+        <h2 className="onb-title">Home address</h2>
+        <p className="onb-sub">Enter your address exactly as it appears on your ID.</p>
         <div className="onb-input-group">
           <label className="onb-label">Street address</label>
           <input className="onb-input" type="text" placeholder="Calle Mayor 12, 3A" value={form.addressLine} onChange={set('addressLine')} autoComplete="street-address" />
         </div>
-
-        <div className="onb-row">
-          <div className="onb-input-group" style={{ flex: 1 }}>
-            <label className="onb-label">City</label>
-            <input className="onb-input" type="text" placeholder="Madrid" value={form.city} onChange={set('city')} autoComplete="address-level2" />
-          </div>
-          <div className="onb-input-group" style={{ width: 110, flexShrink: 0 }}>
-            <label className="onb-label">Postal code</label>
-            <input className="onb-input" type="text" inputMode="numeric" placeholder="28001" value={form.postalCode} onChange={set('postalCode')} autoComplete="postal-code" />
-          </div>
+        <div className="onb-input-group">
+          <label className="onb-label">City</label>
+          <input className="onb-input" type="text" placeholder="Madrid" value={form.city} onChange={set('city')} autoComplete="address-level2" />
         </div>
-
+        <div className="onb-input-group">
+          <label className="onb-label">Postal code</label>
+          <input className="onb-input" type="text" inputMode="numeric" placeholder="28001" value={form.postalCode} onChange={set('postalCode')} autoComplete="postal-code" />
+        </div>
         <div className="onb-input-group">
           <label className="onb-label">Country</label>
           <select className="onb-input onb-select" value={form.country} onChange={set('country')} autoComplete="country">
@@ -915,13 +989,29 @@ export function OnboardingFlow({ phase, data, advance, back }: OnboardingFlowPro
           <StepEmailVerification
             key="email_verification"
             email={data.email}
-            onNext={() => advance('identity')}
+            onNext={() => advance('identity_name')}
             onBack={back}
           />
         )}
-        {phase === 'identity' && (
-          <StepIdentity
-            key="identity"
+        {phase === 'identity_name' && (
+          <StepName
+            key="identity_name"
+            data={data}
+            onNext={patch => advance('identity_dob', patch)}
+            onBack={back}
+          />
+        )}
+        {phase === 'identity_dob' && (
+          <StepDateOfBirth
+            key="identity_dob"
+            data={data}
+            onNext={patch => advance('identity_address', patch)}
+            onBack={back}
+          />
+        )}
+        {phase === 'identity_address' && (
+          <StepAddress
+            key="identity_address"
             data={data}
             onNext={patch => advance('passport', patch)}
             onBack={back}
