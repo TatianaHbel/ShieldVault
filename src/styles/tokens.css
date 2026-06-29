@@ -1,74 +1,107 @@
 :root {
-  /* ── Brand — ShieldVault blue ─────────────────────────────── */
-  --color-primary:          #1A56DB;
-  --color-primary-active:   #1144C0;
-  --color-primary-disabled: #BFDBFE;
-  --color-on-primary:       #FFFFFF;
+  /* ── Brand — Warm Gold ────────────────────────────────── */
+  --color-primary:          #E8C93A;
+  --color-primary-active:   #D4B530;
+  --color-primary-disabled: #3A3220;
+  --color-primary-glow:     rgba(232, 201, 58, 0.10);
+  --color-on-primary:       #0A0A09;
 
-  /* Alias used by component classes */
-  --color-blue: #1A56DB;
+  /* Alias — legacy code references --color-blue */
+  --color-blue: var(--color-primary);
 
-  /* ── Surfaces ─────────────────────────────────────────────── */
-  --color-surface:         #FFFFFF;
-  --color-surface-raised:  #F9FAFB;
-  --color-surface-subtle:  #F3F4F6;
-  --color-border:          #E5E7EB;
-  --color-border-strong:   #D1D5DB;
+  /* ── Canvas & Surfaces ───────────────────────────────── */
+  --color-canvas:           #0A0A09;
+  --color-surface-soft:     #111110;
+  --color-surface-card:     #1A1A18;
+  --color-surface-elevated: #242422;
+  --color-surface-overlay:  #2E2E2A;
 
-  /* ── Text ────────────────────────────────────────────────── */
-  --color-text-primary:   #111827;
-  --color-text-secondary: #6B7280;
-  --color-text-body:      #374151;
-  --color-text-muted:     #9CA3AF;
+  /* Legacy surface aliases */
+  --color-surface:        var(--color-canvas);
+  --color-surface-raised: var(--color-surface-card);
+  --color-surface-subtle: var(--color-surface-soft);
 
-  /* ── Semantic ─────────────────────────────────────────────── */
-  --color-success:    #059669;
-  --color-warning:    #D97706;
-  --color-error:      #DC2626;
-  --color-processing: #1A56DB;
+  /* ── Text ─────────────────────────────────────────────── */
+  --color-ink:         #FFFFFF;
+  --color-body-strong: #E6E6E6;
+  --color-body:        #CCCCCC;
+  --color-muted:       #888888;
+  --color-muted-soft:  #5A5A5A;
 
-  /* Yield accent — emerald */
-  --color-yield:      #059669;
-  --color-yield-bg:   #ECFDF5;
+  /* Legacy text aliases */
+  --color-text-primary:   var(--color-ink);
+  --color-text-secondary: var(--color-muted);
+  --color-text-body:      var(--color-body);
+  --color-text-muted:     var(--color-muted-soft);
 
-  /* ── Typography ──────────────────────────────────────────── */
+  /* ── Borders ──────────────────────────────────────────── */
+  --color-hairline:        #2A2A28;
+  --color-hairline-strong: #3A3A36;
+
+  /* Legacy border aliases */
+  --color-border:        var(--color-hairline);
+  --color-border-strong: var(--color-hairline-strong);
+
+  /* ── Glass System ────────────────────────────────────── */
+  --color-glass-bg:            rgba(255, 255, 255, 0.04);
+  --color-glass-border:        rgba(255, 255, 255, 0.08);
+  --color-glass-border-strong: rgba(255, 255, 255, 0.14);
+  --color-glass-tint:          rgba(232, 201, 58, 0.06);
+  --color-glass-tint-strong:   rgba(232, 201, 58, 0.12);
+
+  /* ── Semantic ─────────────────────────────────────────── */
+  --color-success:    #22C55E;
+  --color-warning:    #F59E0B;
+  --color-error:      #EF4444;
+  --color-processing: var(--color-primary);
+  --color-yield:      #22C55E;
+  --color-yield-bg:   rgba(34, 197, 94, 0.10);
+
+  /* Legacy crypto tokens — neutralized, kept for compat */
+  --color-shielded: var(--color-muted);
+  --color-public:   var(--color-body);
+
+  /* ── Typography ──────────────────────────────────────── */
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --text-body:    16px;
-  --text-small:   14px;
-  --text-caption: 13px;
+  --text-body:    15px;
+  --text-small:   13px;
+  --text-caption: 12px;
   --text-mono:    14px;
 
-  --font-weight-regular:   400;
-  --font-weight-medium:    500;
-  --font-weight-semibold:  600;
-  --font-weight-bold:      700;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
 
-  /* ── Border radius ───────────────────────────────────────── */
+  /* ── Border Radius ───────────────────────────────────── */
   --radius-xs:   4px;
-  --radius-sm:   6px;
-  --radius-md:   8px;
-  --radius-lg:   12px;
-  --radius-xl:   16px;
-  --radius-2xl:  24px;
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  28px;
+  --radius-card: 20px;
   --radius-full: 9999px;
 
-  /* ── Elevation ───────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.07), 0 4px 6px rgba(0,0,0,0.05);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.08), 0 8px 10px rgba(0,0,0,0.04);
+  /* ── Elevation — no drop shadows in this system ─────── */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
 
-  /* ── Motion ──────────────────────────────────────────────── */
-  --duration-fast:   100ms;
-  --duration-normal: 200ms;
-  --duration-slow:   300ms;
+  /* ── Motion ──────────────────────────────────────────── */
+  --duration-fast:   150ms;
+  --duration-normal: 300ms;
+  --duration-slow:   500ms;
+  --duration-reveal: 700ms;
 
-  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1); /* no bounce — alias to ease-out */
 
-  /* ── Spacing (4px base) ──────────────────────────────────── */
+  /* ── Spacing (4px base) ──────────────────────────────── */
   --space-1:  4px;
   --space-2:  8px;
   --space-3:  12px;
@@ -76,7 +109,12 @@
   --space-5:  20px;
   --space-6:  24px;
   --space-8:  32px;
+  --space-10: 40px;
   --space-12: 48px;
+  --space-16: 64px;
+
+  --screen-padding-x: 24px;
+  --screen-padding-y: 32px;
 }
 
 @keyframes pulse-badge {

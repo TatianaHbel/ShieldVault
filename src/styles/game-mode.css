@@ -1,0 +1,440 @@
+/* ═══════════════════════════════════════════════════════
+   GAME MODE — Sci-fi arcade hybrid
+   CRT scanlines · pixel terminal · mission progression
+═══════════════════════════════════════════════════════ */
+
+/* ── Hidden trigger ──────────────────────────────────── */
+
+.gm-trigger {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(232, 201, 58, 0.14);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 6px;
+  line-height: 1;
+  font-family: monospace;
+  z-index: 10;
+  transition: color 0.5s, transform 0.4s;
+}
+.gm-trigger:hover {
+  color: rgba(232, 201, 58, 0.5);
+  transform: rotate(45deg);
+}
+
+/* ── CRT scanlines overlay ───────────────────────────── */
+
+.gm-crt {
+  position: relative;
+}
+.gm-crt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* ── Blinking cursor ─────────────────────────────────── */
+
+@keyframes gm-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.gm-cursor {
+  display: inline-block;
+  width: 7px;
+  height: 1em;
+  background: var(--color-primary);
+  animation: gm-blink 1s step-end infinite;
+  vertical-align: -0.1em;
+  margin-left: 1px;
+}
+
+/* ── Base screen ─────────────────────────────────────── */
+
+.gm-screen {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: 'Courier New', monospace;
+  position: relative;
+  overflow: hidden;
+}
+
+.gm-footer {
+  padding: 12px 24px 28px;
+  flex-shrink: 0;
+}
+
+.gm-sep {
+  border: none;
+  border-top: 1px solid rgba(232, 201, 58, 0.08);
+  margin: 0;
+}
+
+/* ── Button ──────────────────────────────────────────── */
+
+.gm-btn {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-primary);
+  background: transparent;
+  border: 1px solid rgba(232, 201, 58, 0.35);
+  padding: 14px 28px;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.2s, background 0.2s, text-shadow 0.2s;
+}
+.gm-btn:hover:not(:disabled) {
+  border-color: rgba(232, 201, 58, 0.75);
+  background: rgba(232, 201, 58, 0.05);
+  text-shadow: 0 0 12px rgba(232, 201, 58, 0.5);
+}
+.gm-btn:active:not(:disabled) {
+  background: rgba(232, 201, 58, 0.1);
+}
+.gm-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+.gm-btn--green {
+  color: #22C55E;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+.gm-btn--green:hover:not(:disabled) {
+  border-color: rgba(34, 197, 94, 0.75);
+  background: rgba(34, 197, 94, 0.05);
+  text-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+}
+
+/* ── Glitch animation ────────────────────────────────── */
+
+@keyframes gm-glitch {
+  0%, 88%, 100% { transform: translateX(0);  opacity: 1; }
+  89%           { transform: translateX(-3px); opacity: 0.85; }
+  90%           { transform: translateX(3px);  opacity: 0.9; }
+  91%           { transform: translateX(0);    opacity: 1; }
+}
+.gm-glitch {
+  animation: gm-glitch 5s ease-in-out infinite;
+}
+
+/* ── Radar rings ─────────────────────────────────────── */
+
+@keyframes gm-radar {
+  0%   { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.gm-radar {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gm-radar-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary);
+  animation: gm-radar 2.4s ease-out infinite;
+}
+.gm-radar-ring:nth-child(2) { animation-delay: 0.8s; }
+.gm-radar-ring:nth-child(3) { animation-delay: 1.6s; }
+.gm-alien-center {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Screen 1: Signal Detected ───────────────────────── */
+
+.gm-s1-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 28px;
+  gap: 4px;
+  position: relative;
+}
+.gm-s1-headline {
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: var(--color-primary);
+  text-align: center;
+  margin-top: 28px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 24px rgba(232, 201, 58, 0.35);
+}
+.gm-s1-sub {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--color-muted);
+  text-align: center;
+  max-width: 240px;
+  line-height: 1.7;
+  min-height: 48px;
+}
+.gm-s1-status {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: rgba(232, 201, 58, 0.5);
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* Background alien fleet */
+.gm-bg-fleet {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.gm-bg-alien {
+  position: absolute;
+  opacity: 0.055;
+}
+
+/* Coords watermark */
+.gm-coords {
+  position: absolute;
+  bottom: 7px;
+  left: 14px;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.07);
+  font-family: 'Courier New', monospace;
+}
+
+/* ── Screen 2: Identity Scan ─────────────────────────── */
+
+.gm-s2-header {
+  padding: 18px 24px 0;
+  flex-shrink: 0;
+}
+.gm-mission-tag {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.gm-mission-title {
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--color-primary);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.gm-progress-blocks {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.gm-pb {
+  height: 3px;
+  flex: 1;
+  background: rgba(232, 201, 58, 0.12);
+  transition: background 0.3s;
+}
+.gm-pb--on {
+  background: var(--color-primary);
+}
+
+.gm-s2-body {
+  flex: 1;
+  padding: 20px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+}
+.gm-boot-log {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--color-muted);
+  line-height: 1.9;
+}
+
+.gm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.gm-field-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+.gm-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(232, 201, 58, 0.18);
+  padding-bottom: 8px;
+}
+.gm-field-row--focused {
+  border-bottom-color: rgba(232, 201, 58, 0.55);
+}
+.gm-field-prompt {
+  color: var(--color-primary);
+  font-size: 14px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.gm-field-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-ink);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  letter-spacing: 1px;
+  caret-color: var(--color-primary);
+  padding: 0;
+}
+.gm-field-input::placeholder {
+  color: rgba(255, 255, 255, 0.13);
+  font-style: italic;
+}
+.gm-field-ok {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: #22C55E;
+  flex-shrink: 0;
+}
+
+/* Scan state */
+.gm-scan-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.gm-scan-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--color-primary);
+  text-align: center;
+}
+.gm-scan-sub {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--color-muted);
+  text-align: center;
+}
+.gm-confirmed-label {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #22C55E;
+  text-align: center;
+}
+.gm-confirmed-agent {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--color-muted);
+  text-align: center;
+  margin-top: -6px;
+}
+
+/* ── Screen 3: Access Granted ────────────────────────── */
+
+.gm-s3-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 28px;
+  gap: 14px;
+  position: relative;
+}
+.gm-access-badge {
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: #22C55E;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  margin-bottom: 4px;
+}
+.gm-access-headline {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--color-ink);
+  text-align: center;
+}
+.gm-access-agent {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--color-primary);
+  text-align: center;
+  text-shadow: 0 0 18px rgba(232, 201, 58, 0.45);
+}
+.gm-xp-wrap {
+  width: 100%;
+  max-width: 270px;
+  margin-top: 4px;
+}
+.gm-xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--color-muted);
+  margin-bottom: 5px;
+}
+.gm-xp-track {
+  height: 3px;
+  background: rgba(232, 201, 58, 0.1);
+  overflow: hidden;
+}
+.gm-xp-fill {
+  height: 100%;
+  background: var(--color-primary);
+  box-shadow: 0 0 8px rgba(232, 201, 58, 0.6);
+  transition: width 0.04s linear;
+}
+.gm-net-rows {
+  width: 100%;
+  max-width: 270px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.gm-net-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--color-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding-bottom: 4px;
+}
+.gm-net-row span:last-child {
+  color: #22C55E;
+}

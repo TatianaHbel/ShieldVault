@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronLeft, TrendingUp, Check, ShieldCheck } from 'lucide-react'
+import { ChevronLeft, ChevronRight, TrendingUp, Check, ShieldCheck, FileText, Shield } from 'lucide-react'
 import { Button } from '../../components/Button'
 import type { OnboardingData } from '../../hooks/useOnboarding'
 import type { OnboardingStep, CardTier } from '../../types/index'
@@ -17,6 +17,19 @@ const SLIDE = {
   animate: { opacity: 1, x: 0 },
   exit:    { opacity: 0, x: -28 },
   transition: { type: 'spring' as const, damping: 28, stiffness: 320, mass: 0.8 },
+}
+
+const SLIDE_RIGHT = {
+  initial: { x: '100%' },
+  animate: { x: 0 },
+  exit:    { x: '100%' },
+  transition: { type: 'spring' as const, damping: 28, stiffness: 320, mass: 0.8 },
+}
+
+function flagEmoji(code: string): string {
+  return [...code.toUpperCase()].map(
+    c => String.fromCodePoint(0x1F1E6 + c.charCodeAt(0) - 65)
+  ).join('')
 }
 
 const STEP_ORDER = ['email', 'email_verification', 'identity_name', 'identity_dob', 'identity_address', 'passport', 'tos', 'funding', 'card_selection']
@@ -279,6 +292,12 @@ function StepName({
 
 // ── Step 3b: Date of birth ──────────────────────────────────────
 
+const MONTHS = [
+  'January', 'February', 'March', 'April',
+  'May', 'June', 'July', 'August',
+  'September', 'October', 'November', 'December',
+]
+
 function StepDateOfBirth({
   data,
   onNext,
@@ -288,8 +307,16 @@ function StepDateOfBirth({
   onNext: (patch: Partial<OnboardingData>) => void
   onBack: () => void
 }) {
-  const [dateOfBirth, setDateOfBirth] = useState(data.dateOfBirth)
-  const canContinue = dateOfBirth.length > 0
+  const existing = data.dateOfBirth ? data.dateOfBirth.split('-') : []
+  const [day,   setDay]   = useState(existing[2] ? String(parseInt(existing[2], 10)) : '')
+  const [month, setMonth] = useState(existing[1] || '')
+  const [year,  setYear]  = useState(existing[0] || '')
+
+  const canContinue = day.trim().length > 0 && month !== '' && year.length === 4
+
+  const handleContinue = () => {
+    onNext({ dateOfBirth: `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}` })
+  }
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
@@ -299,13 +326,46 @@ function StepDateOfBirth({
         <p className="onb-sub">Required for identity verification. Must match your ID.</p>
         <div className="onb-input-group">
           <label className="onb-label">Date of birth</label>
-          <input
-            className="onb-input"
-            type="date"
-            value={dateOfBirth}
-            onChange={e => setDateOfBirth(e.target.value)}
-            autoComplete="bday"
-          />
+          <div className="onb-dob-row">
+            <div className="onb-dob-field onb-dob-field--day">
+              <span className="onb-dob-sublabel">Day</span>
+              <input
+                className="onb-input onb-dob-num"
+                type="text"
+                inputMode="numeric"
+                maxLength={2}
+                placeholder="DD"
+                value={day}
+                autoFocus
+                onChange={e => setDay(e.target.value.replace(/\D/g, '').slice(0, 2))}
+              />
+            </div>
+            <div className="onb-dob-field onb-dob-field--month">
+              <span className="onb-dob-sublabel">Month</span>
+              <select
+                className="onb-input onb-select"
+                value={month}
+                onChange={e => setMonth(e.target.value)}
+              >
+                <option value="">Select</option>
+                {MONTHS.map((m, i) => (
+                  <option key={m} value={String(i + 1).padStart(2, '0')}>{m}</option>
+                ))}
+              </select>
+            </div>
+            <div className="onb-dob-field onb-dob-field--year">
+              <span className="onb-dob-sublabel">Year</span>
+              <input
+                className="onb-input onb-dob-num"
+                type="text"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder="YYYY"
+                value={year}
+                onChange={e => setYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              />
+            </div>
+          </div>
         </div>
       </div>
       <div className="onb-footer">
@@ -314,10 +374,70 @@ function StepDateOfBirth({
           size="lg"
           style={{ width: '100%' }}
           disabled={!canContinue}
-          onClick={() => onNext({ dateOfBirth })}
+          onClick={handleContinue}
         >
           Continue
         </Button>
+      </div>
+    </motion.div>
+  )
+}
+
+// ── Country picker (used inside StepAddress) ────────────────────
+
+function CountryPickerScreen({
+  selected,
+  onSelect,
+  onBack,
+}: {
+  selected: string
+  onSelect: (code: string) => void
+  onBack: () => void
+}) {
+  const [query, setQuery] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const filtered = EU_COUNTRIES.filter(c =>
+    c.name.toLowerCase().includes(query.toLowerCase())
+  )
+
+  return (
+    <motion.div className="onb-screen" {...SLIDE_RIGHT}>
+      <div className="onb-picker-header">
+        <button className="onb-back-btn" onClick={onBack} aria-label="Go back">
+          <ChevronLeft size={20} />
+        </button>
+        <span className="onb-picker-title">Select country</span>
+        <div style={{ width: 40 }} />
+      </div>
+      <div className="onb-picker-search-wrap">
+        <input
+          ref={inputRef}
+          className="onb-picker-search"
+          type="text"
+          placeholder="Search countries..."
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+        />
+      </div>
+      <div className="onb-picker-list">
+        {filtered.map(c => (
+          <button
+            key={c.code}
+            className={`onb-picker-row${c.code === selected ? ' onb-picker-row--selected' : ''}`}
+            onClick={() => onSelect(c.code)}
+          >
+            <span className="onb-picker-row__flag">{flagEmoji(c.code)}</span>
+            <span className="onb-picker-row__name">{c.name}</span>
+            {c.code === selected && (
+              <Check size={16} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+            )}
+          </button>
+        ))}
       </div>
     </motion.div>
   )
@@ -356,14 +476,16 @@ function StepAddress({
     postalCode:  data.postalCode  || '',
     country:     data.country     || 'ES',
   })
+  const [showPicker, setShowPicker] = useState(false)
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
   const canContinue = form.addressLine.trim() && form.city.trim() && form.postalCode.trim()
+  const selectedCountry = EU_COUNTRIES.find(c => c.code === form.country)
 
   return (
-    <motion.div className="onb-screen" {...SLIDE}>
+    <motion.div className="onb-screen" {...SLIDE} style={{ overflow: 'hidden' }}>
       <OnbHeader phase="identity_address" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Home address</h2>
@@ -382,11 +504,17 @@ function StepAddress({
         </div>
         <div className="onb-input-group">
           <label className="onb-label">Country</label>
-          <select className="onb-input onb-select" value={form.country} onChange={set('country')} autoComplete="country">
-            {EU_COUNTRIES.map(c => (
-              <option key={c.code} value={c.code}>{c.name}</option>
-            ))}
-          </select>
+          <button
+            type="button"
+            className="onb-country-btn"
+            onClick={() => setShowPicker(true)}
+          >
+            <span className="onb-country-btn__flag">{flagEmoji(form.country)}</span>
+            <span className="onb-country-btn__name">
+              {selectedCountry?.name ?? 'Select country'}
+            </span>
+            <ChevronRight size={18} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
+          </button>
         </div>
       </div>
       <div className="onb-footer">
@@ -400,6 +528,20 @@ function StepAddress({
           Continue
         </Button>
       </div>
+
+      <AnimatePresence>
+        {showPicker && (
+          <CountryPickerScreen
+            key="country-picker"
+            selected={form.country}
+            onSelect={code => {
+              setForm(f => ({ ...f, country: code }))
+              setShowPicker(false)
+            }}
+            onBack={() => setShowPicker(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }
@@ -563,39 +705,49 @@ function StepPassport({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 // ── Step 4: Terms of Service ────────────────────────────────────
 
 function StepTos({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [agreed, setAgreed] = useState(false)
-
   return (
     <motion.div className="onb-screen" {...SLIDE}>
       <OnbHeader phase="tos" onBack={onBack} />
       <div className="onb-body">
-        <h2 className="onb-title">Terms and conditions</h2>
-        <p className="onb-sub">Please review and accept before continuing.</p>
-        <div className="onb-tos-box">
-          <p>By using ShieldVault, you agree to our Terms of Service and Privacy Policy. ShieldVault provides payment account services. Your account balance earns yield automatically through regulated protocols. Funds are processed and settled securely.</p>
-          <p>You agree to provide accurate identity information and to use the service only for lawful purposes. ShieldVault may suspend accounts suspected of fraudulent activity. Interest rates are variable and may change at any time.</p>
-          <p>The VISA card is issued by our partner financial institution. Card usage is subject to additional cardholder terms provided at activation. ShieldVault reserves the right to update these terms with 30 days notice. This service is not a bank deposit.</p>
-          <p>For questions, contact support@shieldvault.com. ShieldVault complies with all applicable AML and KYC regulations.</p>
+        <div className="onb-tos-hero">
+          <div className="onb-tos-icon">
+            <ShieldCheck size={28} color="var(--color-primary)" />
+          </div>
+          <h2 className="onb-tos-headline">Built to protect you</h2>
+          <p className="onb-tos-summary">
+            Your balance earns automatically and stays private. ShieldVault handles everything else.
+          </p>
         </div>
-        <label className="onb-checkbox-row">
-          <input
-            type="checkbox"
-            checked={agreed}
-            onChange={e => setAgreed(e.target.checked)}
-          />
-          <span>I have read and agree to the Terms of Service and Privacy Policy</span>
-        </label>
+        <div className="onb-tos-docs">
+          <button className="onb-tos-doc-row">
+            <div className="onb-tos-doc-icon">
+              <FileText size={16} />
+            </div>
+            <span className="onb-tos-doc-label">Terms of Service</span>
+            <ChevronRight size={16} color="var(--color-text-muted)" />
+          </button>
+          <div className="onb-tos-divider" />
+          <button className="onb-tos-doc-row">
+            <div className="onb-tos-doc-icon">
+              <Shield size={16} />
+            </div>
+            <span className="onb-tos-doc-label">Privacy Policy</span>
+            <ChevronRight size={16} color="var(--color-text-muted)" />
+          </button>
+        </div>
       </div>
       <div className="onb-footer">
         <Button
           variant="primary"
           size="lg"
           style={{ width: '100%' }}
-          disabled={!agreed}
           onClick={onNext}
         >
           Accept and continue
         </Button>
+        <p className="onb-tos-footnote">
+          {'By tapping "Accept and continue" you agree to our Terms of Service and Privacy Policy.'}
+        </p>
       </div>
     </motion.div>
   )

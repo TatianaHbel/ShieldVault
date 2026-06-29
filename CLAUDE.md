@@ -175,13 +175,17 @@ how long it takes + that the user can leave.
 
 ## Design direction
 
-**Reference:** Revolut, N26 — accessible, clean, retail-grade financial UX.
-**Anti-reference:** crypto-native aesthetics — no neon, no dark-and-glowing UI, no DeFi jargon.
+**Source of truth:** `docs/DESIGN.md` — the complete design constitution. All token values,
+component specs, copy rules, and generation rules live there. This section is a summary only.
 
-**Light mode.** The token system (`styles/tokens.css`) defines a light palette.
-Dark mode tokens can be added later but are not a shipping requirement.
+**Reference:** Apple Wallet, Revolut Ultra, Nothing, Swiss Graphic Design, Dieter Rams.
+**Anti-reference:** crypto wallets, Web3 aesthetics, neon, dark mesh gradients, DeFi UI.
 
-**Brand color:** `#1A56DB` — deep blue. Trustworthy, modern, financial.
+**Dark mode only.** `styles/tokens.css` must match `docs/DESIGN.md` token values.
 
-**Motion:** Framer Motion, spring easing. Animations communicate state transitions —
-they do not decorate. No looping or ambient motion.
+**Brand color:** `#E8C93A` — warm gold. Natural light through glass. Never electric or neon.
+
+**Color palette:** Near-black canvas (`#0A0A09`), warm gold (`#E8C93A`), white text. No blue.
+
+**Motion:** Framer Motion, slow ease-out only. `cubic-bezier(0.16, 1, 0.3, 1)`.
+No spring bounce, no elastic easing. Animations communicate state — they do not decorate.

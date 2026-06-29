@@ -13,8 +13,8 @@ html, body, #root {
 }
 
 body {
-  background: #F3F4F6;
-  color: var(--color-text-primary);
+  background: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--text-body);
   -webkit-font-smoothing: antialiased;
