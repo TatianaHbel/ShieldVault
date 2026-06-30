@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Button } from './Button'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Download,
