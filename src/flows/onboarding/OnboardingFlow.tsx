@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, TrendingUp, Check, ShieldCheck, FileText, Shield } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
 import { Button } from '../../components/Button'
 import type { OnboardingData } from '../../hooks/useOnboarding'
 import type { OnboardingStep, CardTier } from '../../types/index'
@@ -40,6 +41,21 @@ function stepNumber(phase: string): number {
   return idx >= 0 ? idx + 1 : 0
 }
 
+// Phases where the header should NOT appear
+const HEADERLESS_PHASES = ['kyc_review', 'kyc_rejected', 'processing', 'completing', 'completed']
+
+// funding_crypto and funding_fiat show the progress bar as step 8 (funding)
+function getHeaderPhase(phase: string): string | null {
+  if (HEADERLESS_PHASES.includes(phase)) return null
+  if (phase === 'funding_crypto' || phase === 'funding_fiat') return 'funding'
+  return phase
+}
+
+// EIP-681 payment request URI for 50 USDC on Ethereum mainnet
+const USDC_CONTRACT = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+const DEMO_ADDRESS = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
+const EIP681_URI = `ethereum:${USDC_CONTRACT}@1/transfer?address=${DEMO_ADDRESS}&uint256=50000000`
+
 // ── Shared header: progress bar + back button ───────────────────
 
 function OnbHeader({ phase, onBack }: { phase: string; onBack?: () => void }) {
@@ -77,18 +93,16 @@ function OnbHeader({ phase, onBack }: { phase: string; onBack?: () => void }) {
 function StepEmail({
   data,
   onNext,
-  onBack,
+
 }: {
   data: OnboardingData
   onNext: (email: string) => void
-  onBack: () => void
 }) {
   const [email, setEmail] = useState(data.email)
   const canContinue = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="email" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Create your account</h2>
         <p className="onb-sub">Enter your email to get started.</p>
@@ -152,11 +166,10 @@ function StepEmail({
 function StepEmailVerification({
   email,
   onNext,
-  onBack,
+
 }: {
   email: string
   onNext: () => void
-  onBack: () => void
 }) {
   const [otp, setOtp] = useState('')
   const [countdown, setCountdown] = useState(30)
@@ -183,7 +196,6 @@ function StepEmailVerification({
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="email_verification" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Check your inbox</h2>
         <p className="onb-sub">We sent a 6-digit code to {displayEmail}</p>
@@ -235,11 +247,10 @@ function StepEmailVerification({
 function StepName({
   data,
   onNext,
-  onBack,
+
 }: {
   data: OnboardingData
   onNext: (patch: Partial<OnboardingData>) => void
-  onBack: () => void
 }) {
   const [firstName, setFirstName] = useState(data.firstName)
   const [lastName, setLastName] = useState(data.lastName)
@@ -247,7 +258,6 @@ function StepName({
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="identity_name" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">{"What's your name?"}</h2>
         <p className="onb-sub">Enter your name exactly as it appears on your ID.</p>
@@ -301,11 +311,10 @@ const MONTHS = [
 function StepDateOfBirth({
   data,
   onNext,
-  onBack,
+
 }: {
   data: OnboardingData
   onNext: (patch: Partial<OnboardingData>) => void
-  onBack: () => void
 }) {
   const existing = data.dateOfBirth ? data.dateOfBirth.split('-') : []
   const [day,   setDay]   = useState(existing[2] ? String(parseInt(existing[2], 10)) : '')
@@ -320,7 +329,6 @@ function StepDateOfBirth({
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="identity_dob" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Date of birth</h2>
         <p className="onb-sub">Required for identity verification. Must match your ID.</p>
@@ -383,7 +391,7 @@ function StepDateOfBirth({
   )
 }
 
-// ── Country picker (used inside StepAddress) ────────────────────
+// ── Country picker (used by StepAddress via orchestrator) ───────
 
 function CountryPickerScreen({
   selected,
@@ -464,29 +472,29 @@ const EU_COUNTRIES = [
 function StepAddress({
   data,
   onNext,
-  onBack,
+
+  country,
+  onOpenPicker,
 }: {
   data: OnboardingData
   onNext: (patch: Partial<OnboardingData>) => void
-  onBack: () => void
+  country: string
+  onOpenPicker: () => void
 }) {
   const [form, setForm] = useState({
     addressLine: data.addressLine || '',
     city:        data.city        || '',
     postalCode:  data.postalCode  || '',
-    country:     data.country     || 'ES',
   })
-  const [showPicker, setShowPicker] = useState(false)
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
   const canContinue = form.addressLine.trim() && form.city.trim() && form.postalCode.trim()
-  const selectedCountry = EU_COUNTRIES.find(c => c.code === form.country)
+  const selectedCountry = EU_COUNTRIES.find(c => c.code === country)
 
   return (
-    <motion.div className="onb-screen" {...SLIDE} style={{ overflow: 'hidden' }}>
-      <OnbHeader phase="identity_address" onBack={onBack} />
+    <motion.div className="onb-screen" {...SLIDE}>
       <div className="onb-body">
         <h2 className="onb-title">Home address</h2>
         <p className="onb-sub">Enter your address exactly as it appears on your ID.</p>
@@ -507,9 +515,9 @@ function StepAddress({
           <button
             type="button"
             className="onb-country-btn"
-            onClick={() => setShowPicker(true)}
+            onClick={onOpenPicker}
           >
-            <span className="onb-country-btn__flag">{flagEmoji(form.country)}</span>
+            <span className="onb-country-btn__flag">{flagEmoji(country)}</span>
             <span className="onb-country-btn__name">
               {selectedCountry?.name ?? 'Select country'}
             </span>
@@ -523,25 +531,11 @@ function StepAddress({
           size="lg"
           style={{ width: '100%' }}
           disabled={!canContinue}
-          onClick={() => onNext(form)}
+          onClick={() => onNext({ ...form, country })}
         >
           Continue
         </Button>
       </div>
-
-      <AnimatePresence>
-        {showPicker && (
-          <CountryPickerScreen
-            key="country-picker"
-            selected={form.country}
-            onSelect={code => {
-              setForm(f => ({ ...f, country: code }))
-              setShowPicker(false)
-            }}
-            onBack={() => setShowPicker(false)}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   )
 }
@@ -632,12 +626,11 @@ function StepKycRejected({ onRetry }: { onRetry: () => void }) {
 
 // ── Step 4: Passport / KYC ──────────────────────────────────────
 
-function StepPassport({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function StepPassport({ onNext }: { onNext: () => void }) {
   const [uploaded, setUploaded] = useState(false)
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="passport" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Verify your identity</h2>
         <p className="onb-sub">We need a photo of your passport or ID to open your account.</p>
@@ -704,10 +697,9 @@ function StepPassport({ onNext, onBack }: { onNext: () => void; onBack: () => vo
 
 // ── Step 4: Terms of Service ────────────────────────────────────
 
-function StepTos({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function StepTos({ onNext }: { onNext: () => void }) {
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="tos" onBack={onBack} />
       <div className="onb-body">
         <div className="onb-tos-hero">
           <div className="onb-tos-icon">
@@ -758,15 +750,13 @@ function StepTos({ onNext, onBack }: { onNext: () => void; onBack: () => void })
 function StepFunding({
   onCrypto,
   onFiat,
-  onBack,
+
 }: {
   onCrypto: () => void
   onFiat: () => void
-  onBack: () => void
 }) {
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="funding" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Deposit to activate</h2>
         <p className="onb-sub">
@@ -774,7 +764,6 @@ function StepFunding({
           Once {"you're"} in, you choose how it grows.
         </p>
 
-        {/* Yield teaser — invitation, not explanation */}
         <div className="onb-yield-teaser">
           <div className="onb-yield-teaser__icon">
             <TrendingUp size={16} />
@@ -829,9 +818,7 @@ function StepFunding({
 
 // ── Step 5a: Funding — crypto stream ────────────────────────────
 
-const DEMO_ADDRESS = '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
-
-function StepFundingCrypto({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+function StepFundingCrypto({ onNext }: { onNext: () => void }) {
   const [copied, setCopied] = useState(false)
   const shortAddr = DEMO_ADDRESS.slice(0, 8) + '...' + DEMO_ADDRESS.slice(-6)
 
@@ -843,25 +830,41 @@ function StepFundingCrypto({ onNext, onBack }: { onNext: () => void; onBack: () 
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="funding" onBack={onBack} />
       <div className="onb-body">
-        <h2 className="onb-title">Send USDC to your account</h2>
-        <p className="onb-sub">Transfer at least $50 worth of USDC to this address. Network fees are covered.</p>
+        <h2 className="onb-title">Scan to send 50 USDC</h2>
+        <p className="onb-sub">Open MetaMask or any Ethereum wallet and scan the code. It pre-fills the recipient and amount.</p>
+
+        <div className="onb-qr-card">
+          <QRCodeSVG
+            value={EIP681_URI}
+            size={192}
+            bgColor="#FFFFFF"
+            fgColor="#0A0A09"
+            level="M"
+          />
+          <div className="onb-qr-label">50 USDC on Ethereum</div>
+        </div>
+
         <div className="onb-address-box">
-          <div className="onb-address-label">Your deposit address</div>
+          <div className="onb-address-label">Or copy the deposit address</div>
           <div className="onb-address-value">{shortAddr}</div>
           <button className="onb-address-copy" onClick={handleCopy}>
             {copied ? 'Copied!' : 'Copy address'}
           </button>
         </div>
+
         <div className="onb-info-table">
           <div className="onb-info-row">
-            <span>Supported assets</span>
-            <span>USDC, ETH, BTC</span>
+            <span>Token</span>
+            <span>USDC</span>
           </div>
           <div className="onb-info-row">
-            <span>Minimum deposit</span>
-            <span>$50</span>
+            <span>Amount</span>
+            <span>50 USDC minimum</span>
+          </div>
+          <div className="onb-info-row">
+            <span>Network</span>
+            <span>Ethereum</span>
           </div>
           <div className="onb-info-row">
             <span>Arrival time</span>
@@ -882,16 +885,14 @@ function StepFundingCrypto({ onNext, onBack }: { onNext: () => void; onBack: () 
 
 function StepFundingFiat({
   onNext,
-  onBack,
+
 }: {
   onNext: (method: 'bank_transfer' | 'credit_card') => void
-  onBack: () => void
 }) {
   const [method, setMethod] = useState<'bank_transfer' | 'credit_card' | null>(null)
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="funding" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Add funds</h2>
         <p className="onb-sub">Choose how you would like to make your first deposit of $50.</p>
@@ -996,16 +997,14 @@ const PLAN_PERKS: Record<CardTier, string[]> = {
 
 function StepCardSelection({
   onNext,
-  onBack,
+
 }: {
   onNext: (tier: CardTier) => void
-  onBack: () => void
 }) {
   const [selected, setSelected] = useState<CardTier>('premier')
 
   return (
     <motion.div className="onb-screen" {...SLIDE}>
-      <OnbHeader phase="card_selection" onBack={onBack} />
       <div className="onb-body">
         <h2 className="onb-title">Choose your card</h2>
         <p className="onb-sub">Your card is included with your account. Upgrade anytime.</p>
@@ -1104,7 +1103,7 @@ function StepCompleting({ onDone }: { onDone: () => void }) {
           </div>
         </motion.div>
         <p className="onb-completed__sub">
-          Your account is active and your balance is ready to use.
+          Your account is active. Set up yield from your home screen to start earning.
         </p>
       </div>
       <div className="onb-footer">
@@ -1119,115 +1118,134 @@ function StepCompleting({ onDone }: { onDone: () => void }) {
 // ── Orchestrator ────────────────────────────────────────────────
 
 export function OnboardingFlow({ phase, data, advance, back }: OnboardingFlowProps) {
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false)
+  const [addressCountry, setAddressCountry] = useState(data.country || 'ES')
+
+  const headerPhase = getHeaderPhase(phase)
+
   return (
-    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-      <AnimatePresence mode="wait">
-        {phase === 'email' && (
-          <StepEmail
-            key="email"
-            data={data}
-            onNext={email => advance('email_verification', { email })}
-            onBack={back}
-          />
-        )}
-        {phase === 'email_verification' && (
-          <StepEmailVerification
-            key="email_verification"
-            email={data.email}
-            onNext={() => advance('identity_name')}
-            onBack={back}
-          />
-        )}
-        {phase === 'identity_name' && (
-          <StepName
-            key="identity_name"
-            data={data}
-            onNext={patch => advance('identity_dob', patch)}
-            onBack={back}
-          />
-        )}
-        {phase === 'identity_dob' && (
-          <StepDateOfBirth
-            key="identity_dob"
-            data={data}
-            onNext={patch => advance('identity_address', patch)}
-            onBack={back}
-          />
-        )}
-        {phase === 'identity_address' && (
-          <StepAddress
-            key="identity_address"
-            data={data}
-            onNext={patch => advance('passport', patch)}
-            onBack={back}
-          />
-        )}
-        {phase === 'passport' && (
-          <StepPassport
-            key="passport"
-            onNext={() => advance('kyc_review')}
-            onBack={back}
-          />
-        )}
-        {phase === 'kyc_review' && (
-          <StepKycReview
-            key="kyc_review"
-            onApproved={() => advance('tos')}
-            onRejected={() => advance('kyc_rejected')}
-          />
-        )}
-        {phase === 'kyc_rejected' && (
-          <StepKycRejected
-            key="kyc_rejected"
-            onRetry={back}
-          />
-        )}
-        {phase === 'tos' && (
-          <StepTos
-            key="tos"
-            onNext={() => advance('funding')}
-            onBack={back}
-          />
-        )}
-        {phase === 'funding' && (
-          <StepFunding
-            key="funding"
-            onCrypto={() => advance('funding_crypto', { fundingStream: 'crypto' })}
-            onFiat={() => advance('funding_fiat', { fundingStream: 'fiat' })}
-            onBack={back}
-          />
-        )}
-        {phase === 'funding_crypto' && (
-          <StepFundingCrypto
-            key="funding_crypto"
-            onNext={() => advance('processing')}
-            onBack={back}
-          />
-        )}
-        {phase === 'funding_fiat' && (
-          <StepFundingFiat
-            key="funding_fiat"
-            onNext={method => advance('processing', { fiatMethod: method })}
-            onBack={back}
-          />
-        )}
-        {phase === 'processing' && (
-          <StepProcessing
-            key="processing"
-            onNext={() => advance('card_selection')}
-          />
-        )}
-        {phase === 'card_selection' && (
-          <StepCardSelection
-            key="card_selection"
-            onNext={tier => advance('completing', { cardTier: tier })}
-            onBack={back}
-          />
-        )}
-        {phase === 'completing' && (
-          <StepCompleting
-            key="completing"
-            onDone={() => advance('completed')}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative' }}>
+      {/* Persistent progress header — lives outside AnimatePresence so it never unmounts */}
+      {headerPhase && (
+        <OnbHeader phase={headerPhase} onBack={back} />
+      )}
+
+      {/* Step content area */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+        <AnimatePresence mode="wait">
+          {phase === 'email' && (
+            <StepEmail
+              key="email"
+              data={data}
+              onNext={email => advance('email_verification', { email })}
+            />
+          )}
+          {phase === 'email_verification' && (
+            <StepEmailVerification
+              key="email_verification"
+              email={data.email}
+              onNext={() => advance('identity_name')}
+            />
+          )}
+          {phase === 'identity_name' && (
+            <StepName
+              key="identity_name"
+              data={data}
+              onNext={patch => advance('identity_dob', patch)}
+            />
+          )}
+          {phase === 'identity_dob' && (
+            <StepDateOfBirth
+              key="identity_dob"
+              data={data}
+              onNext={patch => advance('identity_address', patch)}
+            />
+          )}
+          {phase === 'identity_address' && (
+            <StepAddress
+              key="identity_address"
+              data={data}
+              country={addressCountry}
+              onOpenPicker={() => setCountryPickerOpen(true)}
+              onNext={patch => advance('passport', patch)}
+            />
+          )}
+          {phase === 'passport' && (
+            <StepPassport
+              key="passport"
+              onNext={() => advance('kyc_review')}
+            />
+          )}
+          {phase === 'kyc_review' && (
+            <StepKycReview
+              key="kyc_review"
+              onApproved={() => advance('tos')}
+              onRejected={() => advance('kyc_rejected')}
+            />
+          )}
+          {phase === 'kyc_rejected' && (
+            <StepKycRejected
+              key="kyc_rejected"
+              onRetry={back}
+            />
+          )}
+          {phase === 'tos' && (
+            <StepTos
+              key="tos"
+              onNext={() => advance('funding')}
+            />
+          )}
+          {phase === 'funding' && (
+            <StepFunding
+              key="funding"
+              onCrypto={() => advance('funding_crypto', { fundingStream: 'crypto' })}
+              onFiat={() => advance('funding_fiat', { fundingStream: 'fiat' })}
+            />
+          )}
+          {phase === 'funding_crypto' && (
+            <StepFundingCrypto
+              key="funding_crypto"
+              onNext={() => advance('processing')}
+            />
+          )}
+          {phase === 'funding_fiat' && (
+            <StepFundingFiat
+              key="funding_fiat"
+              onNext={method => advance('processing', { fiatMethod: method })}
+            />
+          )}
+          {phase === 'processing' && (
+            <StepProcessing
+              key="processing"
+              onNext={() => advance('card_selection')}
+            />
+          )}
+          {phase === 'card_selection' && (
+            <StepCardSelection
+              key="card_selection"
+              onNext={tier => advance('completing', { cardTier: tier })}
+            />
+          )}
+          {phase === 'completing' && (
+            <StepCompleting
+              key="completing"
+              onDone={() => advance('completed')}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Country picker — rendered here so it covers the header too */}
+      <AnimatePresence>
+        {countryPickerOpen && (
+          <CountryPickerScreen
+            key="country-picker"
+            selected={addressCountry}
+            onSelect={(code) => {
+              setAddressCountry(code)
+              setCountryPickerOpen(false)
+            }}
+            onBack={() => setCountryPickerOpen(false)}
           />
         )}
       </AnimatePresence>
