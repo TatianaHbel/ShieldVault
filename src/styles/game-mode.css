@@ -8,22 +8,107 @@
 
 .gm-trigger {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  background: none;
-  border: none;
-  color: rgba(22, 255, 72, 0.13);
-  font-size: 15px;
+  top: 10px;
+  right: 10px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 0;
+  color: rgba(22, 255, 72, 0.42);
   cursor: pointer;
-  padding: 6px;
-  line-height: 1;
-  font-family: monospace;
+  padding: 0;
   z-index: 10;
-  transition: color 0.5s, transform 0.4s;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.28s ease, transform 0.28s ease;
 }
-.gm-trigger:hover {
-  color: rgba(22, 255, 72, 0.5);
-  transform: rotate(45deg);
+.gm-trigger::before {
+  content: '';
+  width: 34px;
+  height: 34px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(90deg, rgba(22, 255, 72, 0.18) 0 1px, transparent 1px 100%),
+    linear-gradient(0deg, rgba(22, 255, 72, 0.18) 0 1px, transparent 1px 100%);
+  background-size: 8px 8px;
+  opacity: 0.18;
+  position: absolute;
+  transition: opacity 0.28s ease, border-color 0.28s ease, background-color 0.28s ease;
+}
+.gm-trigger__glyph {
+  width: 22px;
+  height: 22px;
+  position: relative;
+  display: block;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 5px rgba(22, 255, 72, 0.34));
+  animation: gm-trigger-breathe 4.8s ease-in-out infinite;
+  transition: opacity 0.28s ease, transform 0.28s ease, filter 0.28s ease;
+}
+.gm-trigger__dot,
+.gm-trigger__ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+}
+.gm-trigger__dot {
+  width: 5px;
+  height: 5px;
+  background: currentColor;
+  box-shadow: 0 0 8px rgba(22, 255, 72, 0.55);
+  transform: translate(-50%, 5px);
+}
+.gm-trigger__ring {
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+.gm-trigger__ring--one {
+  width: 15px;
+  height: 15px;
+  opacity: 0.84;
+  top: 49%;
+}
+.gm-trigger__ring--two {
+  width: 25px;
+  height: 25px;
+  opacity: 0.48;
+  top: 45%;
+}
+.gm-trigger:hover,
+.gm-trigger:focus-visible {
+  color: rgba(22, 255, 72, 0.86);
+  outline: none;
+}
+.gm-trigger:hover::before,
+.gm-trigger:focus-visible::before {
+  border-color: rgba(22, 255, 72, 0.38);
+  background-color: rgba(22, 255, 72, 0.05);
+  opacity: 0.72;
+}
+.gm-trigger:hover .gm-trigger__glyph,
+.gm-trigger:focus-visible .gm-trigger__glyph {
+  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(22, 255, 72, 0.48));
+  transform: scale(1.08);
+}
+
+@keyframes gm-trigger-breathe {
+  0%, 62%, 100% {
+    opacity: 0.68;
+    transform: scale(1);
+  }
+  72% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  82% {
+    opacity: 0.78;
+    transform: scale(1);
+  }
 }
 
 /* ── CRT scanlines ─────────────────────────────────────────── */

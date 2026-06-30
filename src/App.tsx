@@ -26,8 +26,12 @@ function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMod
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <button className="gm-trigger" onClick={onGameMode} aria-label="">
-        {'◈'}
+      <button className="gm-trigger" onClick={onGameMode} aria-label="Activate hidden Pip-Boy mode">
+        <span className="gm-trigger__glyph" aria-hidden="true">
+          <span className="gm-trigger__dot" />
+          <span className="gm-trigger__ring gm-trigger__ring--one" />
+          <span className="gm-trigger__ring gm-trigger__ring--two" />
+        </span>
       </button>
       <div className="landing-hero">
         <div className="landing-logo">ShieldVault</div>
