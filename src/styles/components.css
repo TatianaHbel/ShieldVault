@@ -154,6 +154,7 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  padding-top: 44px;
 }
 
 .status-bar {
@@ -2150,7 +2151,7 @@
   width: 34px;
   height: 26px;
   border-radius: 5px;
-  background: linear-gradient(135deg, #E8C93A 0%, #D4B530 100%);
+  background: linear-gradient(135deg, #EBFC0E 0%, #D4E40C 100%);
 }
 
 .ob-visa-card__wordmark {
@@ -2349,11 +2350,9 @@
 }
 
 .landing-logo {
-  font-size: 38px;
-  font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.04em;
-  font-family: var(--font-body);
+  width: 420px;
+  height: auto;
+  display: block;
 }
 
 .landing-tagline {
@@ -3438,7 +3437,7 @@
   width: 32px;
   height: 24px;
   border-radius: 5px;
-  background: linear-gradient(135deg, #E8C93A 0%, #D4B530 100%);
+  background: linear-gradient(135deg, #EBFC0E 0%, #D4E40C 100%);
   border: 1px solid rgba(232, 201, 58, 0.4);
 }
 

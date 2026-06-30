@@ -1,9 +1,9 @@
 :root {
   /* ── Brand — Warm Gold ────────────────────────────────── */
-  --color-primary:          #E8C93A;
-  --color-primary-active:   #D4B530;
-  --color-primary-disabled: #3A3220;
-  --color-primary-glow:     rgba(232, 201, 58, 0.10);
+  --color-primary:          #EBFC0E;
+  --color-primary-active:   #D4E40C;
+  --color-primary-disabled: #3A3C10;
+  --color-primary-glow:     rgba(235, 252, 14, 0.10);
   --color-on-primary:       #0A0A09;
 
   /* Alias — legacy code references --color-blue */
