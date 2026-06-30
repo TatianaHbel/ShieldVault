@@ -4,6 +4,7 @@ import { QRCodeSVG } from 'qrcode.react'
 import SVLogo from '../img/SVlogo.svg'
 import LogoPng from '../img/logo.png'
 import PersonaPhoto from '../img/landing/magnific_editorial-photography-for_kLfTkya16B.png'
+import ScreenLanding from '../img/screen landing.png'
 import { Button } from '../components/Button'
 import { OnboardingFlow } from '../flows/onboarding/OnboardingFlow'
 import type { OnboardingData } from '../hooks/useOnboarding'
@@ -1232,7 +1233,7 @@ export function UseCase() {
               lineHeight: 1.04,
               maxWidth: 740,
             }}>
-              What if your payment account<br />did more?
+              A new payment app,<br />built for everyone.
             </h1>
             <p style={{
               fontSize: 18,
@@ -1241,51 +1242,58 @@ export function UseCase() {
               margin: 0,
               maxWidth: 580,
             }}>
-              Most people{"'"}s money sits in a current account earning almost nothing.
-              ShieldVault changes that — automatically, silently, and privately.
-              A payment account with a VISA card that yields from day one.
+              ShieldVault is a blockchain-backed payment app designed for mainstream users.
+              No wallet. No crypto knowledge required. Sign up with email, pay with VISA anywhere,
+              and earn automatically on your balance from day one.
             </p>
           </div>
 
-          {/* QR code — try it on your phone */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 36,
-            background: 'var(--color-glass-tint)',
-            border: '1px solid rgba(235,252,14,0.25)',
-            borderRadius: 16,
-            padding: '28px 36px',
-            marginBottom: 56,
-          }}>
-            <div style={{
-              background: '#FFFFFF',
-              borderRadius: 12,
-              padding: 12,
-              flexShrink: 0,
-            }}>
-              <QRCodeSVG
-                value="https://shieldvault.netlify.app"
-                size={120}
-                bgColor="#FFFFFF"
-                fgColor="#0A0A09"
-                level="M"
-              />
-            </div>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 8 }}>
-                Try it on your phone
+          {/* ── PRODUCT SCOPE ── */}
+          <div style={{ marginBottom: 72, paddingBottom: 72, borderBottom: '1px solid var(--color-hairline)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 64, alignItems: 'center' }}>
+
+              {/* Left: text */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 14 }}>
+                  Product
+                </div>
+                <h2 style={{ margin: '0 0 20px', fontSize: 36, fontWeight: 800, color: 'var(--color-ink)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+                  ShieldVault
+                </h2>
+                <p style={{ fontSize: 16, color: 'var(--color-body)', lineHeight: 1.8, margin: '0 0 32px', maxWidth: 420 }}>
+                  A mobile payment app for mainstream users. Sign up with email, pay with a VISA card,
+                  and earn automatically on every dollar in the account.
+                  No wallet. No confirmations. Privacy by default.
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  {([
+                    { label: 'Email or Google', sub: 'No wallet required' },
+                    { label: 'VISA + Apple Pay', sub: 'USD and EUR' },
+                    { label: 'Auto-yield', sub: 'Up to 6.2% APY' },
+                    { label: 'Private by default', sub: 'Amounts stay confidential' },
+                  ] as { label: string; sub: string }[]).map(({ label, sub }) => (
+                    <div key={label} style={{
+                      background: 'var(--color-surface-card)',
+                      border: '1px solid var(--color-hairline)',
+                      borderRadius: 10,
+                      padding: '14px 16px',
+                    }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 3 }}>{label}</div>
+                      <div style={{ fontSize: 12, color: 'var(--color-muted)' }}>{sub}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 8 }}>
-                Scan to open ShieldVault
+
+              {/* Right: screenshot */}
+              <div style={{ width: 240, flexShrink: 0 }}>
+                <img
+                  src={ScreenLanding}
+                  alt="ShieldVault app"
+                  style={{ width: '100%', height: 'auto', display: 'block', borderRadius: 16 }}
+                />
               </div>
-              <div style={{ fontSize: 14, color: 'var(--color-body)', lineHeight: 1.6, marginBottom: 12 }}>
-                Live prototype — full onboarding flow, VISA card selection, and auto-yield.
-                No install required.
-              </div>
-              <div style={{ fontSize: 13, fontFamily: 'monospace', color: 'var(--color-muted)', letterSpacing: '0.01em' }}>
-                shieldvault.netlify.app
-              </div>
+
             </div>
           </div>
 
@@ -1354,7 +1362,7 @@ export function UseCase() {
                     ))}
                   </div>
                   <div style={{ background: 'var(--color-surface-card)', border: '1px solid var(--color-hairline)', borderRadius: 14, padding: '20px' }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-success)', marginBottom: 14 }}>What she wants</div>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-success)', marginBottom: 14 }}>What he wants</div>
                     {[
                       'Money earning without any effort',
                       'One card for everything, worldwide',
@@ -1391,6 +1399,37 @@ export function UseCase() {
               Green is the success terminal. Red dashed branches show failures with retry paths.
             </Callout>
             <Legend />
+
+            {/* QR code — try it on your phone */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 36,
+              background: 'var(--color-glass-tint)',
+              border: '1px solid rgba(235,252,14,0.25)',
+              borderRadius: 16,
+              padding: '28px 36px',
+              marginBottom: 28,
+            }}>
+              <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 12, flexShrink: 0 }}>
+                <QRCodeSVG value="https://shieldvault.netlify.app" size={96} bgColor="#FFFFFF" fgColor="#0A0A09" level="M" />
+              </div>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 6 }}>
+                  Try it on your phone
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                  Scan to walk through the flow
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.6, marginBottom: 8 }}>
+                  Live prototype. Full onboarding flow, VISA card selection, auto-yield. No install required.
+                </div>
+                <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'var(--color-muted)' }}>
+                  shieldvault.netlify.app
+                </div>
+              </div>
+            </div>
+
             <FlowMap />
           </section>
 
