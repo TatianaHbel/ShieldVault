@@ -76,14 +76,14 @@ const PHONE_W = 390
 const PHONE_H = 844
 
 const DEMO_DATA: OnboardingData = {
-  email: 'maria@example.com',
-  firstName: 'Maria',
-  lastName: 'Garcia',
+  email: 'thomas@example.com',
+  firstName: 'Thomas',
+  lastName: 'Dupont',
   dateOfBirth: '1990-05-15',
-  addressLine: 'Calle Mayor 12, 3A',
-  city: 'Madrid',
-  postalCode: '28001',
-  country: 'ES',
+  addressLine: '14 Rue de Rivoli',
+  city: 'Paris',
+  postalCode: '75001',
+  country: 'FR',
   fundingStream: null,
   fiatMethod: null,
   cardTier: null,
@@ -306,9 +306,7 @@ function FlowMap() {
   const OB_Y       = 146
   const FORK_Y     = 340
   const OB_FAIL_Y  = 470
-  const SEP_Y      = 560
-  const PAY_Y      = 650
-  const PAY_FAIL_Y = 790
+
 
   const px = (i: number) => MAIN_X + i * STEP
 
@@ -396,40 +394,10 @@ function FlowMap() {
     actor: 'error', x: px(7) + NW / 2 - 65, y: OB_FAIL_Y, variant: 'terminal',
   }
 
-  const payMain: FN[] = [
-    {
-      id: 'pay_idle', title: 'Send payment',
-      lines: ['Recipient and amount input', 'Balance checked before send'],
-      cta: 'Send',
-      actor: 'user', x: px(0), y: PAY_Y, variant: 'main',
-    },
-    {
-      id: 'pay_submitting', title: 'Submitting',
-      lines: ['Sub-1s spinner — automatic', 'Blockchain op runs silently'],
-      actor: 'system', x: px(1), y: PAY_Y, variant: 'main',
-    },
-    {
-      id: 'pay_processing', title: 'Processing',
-      lines: ['On-chain confirmation', 'A few seconds — close app safely'],
-      actor: 'system', x: px(2), y: PAY_Y, variant: 'main',
-    },
-    {
-      id: 'pay_completed', title: 'Payment sent',
-      lines: ['Balance updated', 'Transaction confirmed'],
-      actor: 'done', x: px(3), y: PAY_Y, variant: 'main',
-    },
-  ]
-
-  const payFailed: FN = {
-    id: 'pay_failed', title: 'Payment failed',
-    lines: ['No funds moved — retry'],
-    actor: 'error', x: px(2) + NW / 2 - 65, y: PAY_FAIL_Y, variant: 'terminal',
-  }
-
-  const allNodes: FN[] = [...obMain, kycRejected, forkCrypto, forkFiat, obFailed, ...payMain, payFailed]
+  const allNodes: FN[] = [...obMain, kycRejected, forkCrypto, forkFiat, obFailed]
 
   const CANVAS_W = px(9) + NW + 40
-  const CANVAS_H = PAY_FAIL_Y + 48 / 2 + 80
+  const CANVAS_H = OB_FAIL_Y + 48 / 2 + 80
 
   const cx = (n: FN) => n.x + nodeW(n) / 2
   const cy = (n: FN) => n.y
@@ -632,16 +600,8 @@ function FlowMap() {
           <path d={retryArc} stroke="#EF4444" strokeWidth="1" fill="none" strokeDasharray="4,3" opacity={0.4} markerEnd="url(#sv-e)" />
           <text x={obFailed.x - 38} y={OB_FAIL_Y + 52} style={{ fontSize: 8, fill: '#EF4444', fontFamily: 'Inter, sans-serif', fontWeight: 700, opacity: 0.7 }}>retry</text>
 
-          <line x1={16} y1={SEP_Y} x2={CANVAS_W - 16} y2={SEP_Y} stroke="#2A2A28" strokeWidth="1" opacity={0.5} />
-
-          {payMain.slice(0, 3).map((n, i) => (
-            <path key={`py-h${i}`} d={hLink(n, payMain[i + 1])} stroke="#2A2A28" strokeWidth="2" fill="none" markerEnd="url(#sv-a)" />
-          ))}
-          <path d={dropArc(payMain[2], payFailed)} stroke="#EF4444" strokeWidth="1" fill="none" strokeDasharray="4,3" opacity={0.4} markerEnd="url(#sv-e)" />
-
           {[
             { label: 'ONBOARDING', x: MAIN_X, y: OB_Y - NH / 2 - 22, color: '#EBFC0E' },
-            { label: 'PAYMENT',    x: px(0),  y: PAY_Y - NH / 2 - 22, color: '#22C55E' },
           ].map(({ label, x, y, color }) => (
             <g key={label}>
               <line x1={x} y1={y - 1} x2={x + 16} y2={y - 1} stroke={color} strokeWidth="2" strokeLinecap="round" />
@@ -751,23 +711,6 @@ function PhaseTable({ rows }: { rows: [string, string, string, string][] }) {
         </tbody>
       </table>
     </div>
-  )
-}
-
-// ── State pill ────────────────────────────────────────────────────────────────
-
-function StatePill({ state, actor }: { state: string; actor: Actor }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 6,
-      padding: '3px 10px', borderRadius: 99,
-      background: FMBG[actor], border: `1px solid ${COL[actor]}2A`,
-      fontSize: 12, fontWeight: 600, color: COL[actor],
-      fontFamily: 'Inter, sans-serif',
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: COL[actor], flexShrink: 0 }} />
-      {state}
-    </span>
   )
 }
 
@@ -1123,7 +1066,6 @@ const NAV = [
       { id: 'problems',   label: 'Problems solved' },
       { id: 'screens',    label: 'Screen gallery' },
       { id: 'onboarding', label: 'Onboarding phases' },
-      { id: 'payment',    label: 'Payment flow' },
       { id: 'copy-rules', label: 'Copy rules' },
     ],
   },
@@ -1347,20 +1289,6 @@ export function UseCase() {
             </div>
           </div>
 
-          {/* Page header */}
-          <div style={{ marginBottom: 72 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 12 }}>
-              ShieldVault
-            </div>
-            <h1 style={{ margin: '0 0 16px', fontSize: 38, fontWeight: 800, color: 'var(--color-ink)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
-              Design and flows
-            </h1>
-            <p style={{ fontSize: 17, color: 'var(--color-body)', lineHeight: 1.7, margin: 0, maxWidth: 680 }}>
-              Design system tokens, component patterns, and user flow documentation for ShieldVault.
-              A retail payment account backed by blockchain — users never see wallets, gas, or signing flows.
-            </p>
-          </div>
-
           {/* ── WHO IS THIS FOR ── */}
 
           <section id="user" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
@@ -1385,7 +1313,7 @@ export function UseCase() {
               }}>
                 <img
                   src={PersonaPhoto}
-                  alt="Maria Garcia"
+                  alt="Thomas Dupont"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
                 />
               </div>
@@ -1393,8 +1321,8 @@ export function UseCase() {
               {/* Persona details */}
               <div>
                 <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 4 }}>Maria Garcia</div>
-                  <div style={{ fontSize: 14, color: 'var(--color-muted)' }}>32 — Senior Marketing Manager — Madrid, Spain</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 4 }}>Thomas Dupont</div>
+                  <div style={{ fontSize: 14, color: 'var(--color-muted)' }}>32 — Senior Marketing Manager — Paris, France</div>
                 </div>
 
                 {/* Tags */}
@@ -1521,6 +1449,20 @@ export function UseCase() {
             </div>
           </section>
 
+          {/* Page header */}
+          <div style={{ marginBottom: 72 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 12 }}>
+              ShieldVault
+            </div>
+            <h1 style={{ margin: '0 0 16px', fontSize: 38, fontWeight: 800, color: 'var(--color-ink)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
+              Design and flows
+            </h1>
+            <p style={{ fontSize: 17, color: 'var(--color-body)', lineHeight: 1.7, margin: 0, maxWidth: 680 }}>
+              Design system tokens, component patterns, and user flow documentation for ShieldVault.
+              A retail payment account backed by blockchain — users never see wallets, gas, or signing flows.
+            </p>
+          </div>
+
           <section id="screens" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>03</span>
@@ -1556,24 +1498,12 @@ export function UseCase() {
                 Presenter note
               </div>
               <p style={{ margin: 0, fontSize: 14, color: 'var(--color-body)', lineHeight: 1.7 }}>
-                This prototype collects all identity fields upfront (name, date of birth, full address).
-                The production intent is <strong style={{ color: 'var(--color-ink)' }}>progressive KYC</strong>:
-                collect only email and name at signup, then request address and further identity details
-                only when a user crosses a transaction threshold (e.g. sending more than $500 in a single
-                transfer or $1,000 cumulative). This reduces drop-off during onboarding while remaining
-                compliant with tiered AML/KYC regulations.
+                This prototype collects all identity fields upfront. Production will use{' '}
+                <strong style={{ color: 'var(--color-ink)' }}>progressive KYC</strong>{' '}
+                — email only at signup, full identity requested only when a transaction threshold is crossed.
               </p>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
-              {[
-                ['email', 'user'], ['email_verification', 'user'], ['identity', 'user'],
-                ['passport', 'user'], ['kyc_review', 'system'], ['kyc_rejected', 'error'],
-                ['tos', 'user'], ['funding', 'user'], ['funding_crypto', 'user'],
-                ['funding_fiat', 'user'], ['processing', 'system'], ['failed', 'error'],
-                ['card_selection', 'user'], ['completed', 'done'],
-              ].map(([s, a]) => <StatePill key={s} state={s} actor={a as Actor} />)}
-            </div>
             <PhaseTable rows={[
               ['email',             'USER',    'Email input + Google/Apple SSO. KYC notice shown upfront.',                                      'Yes'],
               ['email_verification','USER',    '6-digit OTP auto-sent. Auto-submits on completion. Resend after 30s.',                            'Yes'],
@@ -1592,46 +1522,9 @@ export function UseCase() {
             ]} />
           </section>
 
-          <section id="payment" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>04</span>
-              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Payment flow</h2>
-            </div>
-            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
-              Post-onboarding payments are a four-state machine with no wallet confirmation steps.
-              The submitting state replaces the entire wallet signature flow
-              {' — '}
-              it is invisible to the user (spinner only, sub-1s).
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
-              {[
-                ['idle', 'user'], ['submitting', 'system'],
-                ['processing', 'system'], ['completed', 'done'], ['failed', 'error'],
-              ].map(([s, a]) => <StatePill key={s} state={s} actor={a as Actor} />)}
-            </div>
-            <PhaseTable rows={[
-              ['idle',       'USER',    'Recipient and amount input. Balance checked before send.',            'Yes — nothing sent yet'],
-              ['submitting', 'SYSTEM',  'Sub-1s spinner. Blockchain op initiated silently. Automatic.',        'Yes — completes or fails shortly'],
-              ['processing', 'SYSTEM',  'On-chain confirmation in progress. A few seconds.',                   'Yes — balance updates on return'],
-              ['completed',  'DONE',    'Payment sent. Balance updated. Transaction confirmed.',                'n/a — complete'],
-              ['failed',     'TERMINAL','Payment failed. No funds moved. Retry starts a new payment.',         'n/a — retry from idle'],
-            ]} />
-            <div style={{ background: 'var(--color-glass-tint)', border: '1px solid var(--color-glass-border-strong)', borderRadius: 10, padding: '20px 24px' }}>
-              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-muted)', marginBottom: 10 }}>
-                Design principle
-              </div>
-              <blockquote style={{ margin: 0, fontSize: 16, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.6, letterSpacing: '-0.01em' }}>
-                {"\"I started a payment. It went through. My balance is updated.\""}
-              </blockquote>
-              <div style={{ marginTop: 8, fontSize: 13, color: 'var(--color-body)' }}>
-                {"Not: \"I signed something and I'm not sure if it worked.\""}
-              </div>
-            </div>
-          </section>
-
           <section id="copy-rules" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>05</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>04</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Copy rules</h2>
             </div>
             <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
