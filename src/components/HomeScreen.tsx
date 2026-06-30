@@ -109,7 +109,7 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
 
   return (
     <motion.div
-      className="hs-root screen--home"
+      className="hs-root"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
