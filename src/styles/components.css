@@ -4217,6 +4217,394 @@
 
 
 /* ═══════════════════════════════════════════════════════════
+   Pip-Boy mission card skin
+═══════════════════════════════════════════════════════════ */
+
+.pip-card {
+  aspect-ratio: 1.72;
+  width: 100%;
+  min-height: 142px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 82% 26%, rgba(22, 255, 72, 0.22), transparent 22%),
+    linear-gradient(135deg, rgba(22, 255, 72, 0.16), rgba(22, 255, 72, 0.035) 48%, rgba(2, 6, 3, 0.9));
+  border: 1px solid rgba(22, 255, 72, 0.62);
+  color: #16ff48;
+  font-family: 'Share Tech Mono', var(--font-mono);
+  clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+}
+
+.pip-card__grid,
+.pip-card__scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pip-card__grid {
+  background:
+    linear-gradient(rgba(22, 255, 72, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 255, 72, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+
+.pip-card__scan {
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 5px);
+  mix-blend-mode: screen;
+}
+
+.pip-card__corner {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border-color: #16ff48;
+  opacity: 0.92;
+}
+
+.pip-card__corner--tl { top: 10px; left: 10px; border-top: 3px solid; border-left: 3px solid; }
+.pip-card__corner--tr { top: 10px; right: 10px; border-top: 3px solid; border-right: 3px solid; }
+.pip-card__corner--bl { bottom: 10px; left: 10px; border-bottom: 3px solid; border-left: 3px solid; }
+.pip-card__corner--br { bottom: 10px; right: 10px; border-bottom: 3px solid; border-right: 3px solid; }
+
+.pip-card__top,
+.pip-card__bottom,
+.pip-card__mission,
+.pip-card__chip {
+  position: absolute;
+  z-index: 2;
+}
+
+.pip-card__top {
+  top: 18px;
+  left: 22px;
+  right: 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pip-card__issuer {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  line-height: 1;
+}
+
+.pip-card__series {
+  margin-top: 5px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(230, 255, 232, 0.74);
+}
+
+.pip-card__level {
+  border: 1px solid rgba(22, 255, 72, 0.64);
+  padding: 5px 8px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.pip-card__mascot {
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+  bottom: -20px;
+  width: 172px;
+  aspect-ratio: 1;
+  background-image: url('/assets/pipboy/vault-buddy-spritesheet-transparent.png');
+  background-size: 400% 300%;
+  background-position: 100% 100%;
+  opacity: 0.7;
+}
+
+.pip-card--no-mascot {
+  background:
+    linear-gradient(90deg, rgba(22, 255, 72, 0.12) 0 1px, transparent 1px 28px),
+    linear-gradient(180deg, rgba(22, 255, 72, 0.12) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 78% 54%, rgba(22, 255, 72, 0.2), transparent 28%),
+    linear-gradient(135deg, rgba(22, 255, 72, 0.18), rgba(22, 255, 72, 0.045) 52%, rgba(2, 6, 3, 0.96));
+}
+
+.pip-card--no-mascot::before {
+  content: '';
+  position: absolute;
+  right: 26px;
+  top: 78px;
+  width: 96px;
+  height: 50px;
+  border: 1px solid rgba(22, 255, 72, 0.42);
+  border-left: 8px solid rgba(22, 255, 72, 0.58);
+  box-shadow:
+    inset 0 0 0 8px rgba(2, 6, 3, 0.42),
+    0 0 18px rgba(22, 255, 72, 0.12);
+}
+
+.pip-card--no-mascot::after {
+  content: '';
+  position: absolute;
+  right: 36px;
+  top: 148px;
+  width: 112px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--pip-green, #16ff48) 0 10px, transparent 10px 16px);
+  opacity: 0.72;
+}
+
+.pip-card__mission {
+  left: 22px;
+  bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pip-card__mission span {
+  font-size: 10px;
+  color: rgba(230, 255, 232, 0.7);
+  letter-spacing: 0.2em;
+}
+
+.pip-card__mission strong {
+  font-size: 16px;
+  letter-spacing: 0.16em;
+}
+
+.pip-card__chip {
+  left: 22px;
+  top: 72px;
+  width: 45px;
+  height: 34px;
+  border: 2px solid rgba(230, 255, 232, 0.8);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.pip-card__chip span {
+  border: 1px solid rgba(230, 255, 232, 0.38);
+}
+
+.pip-card__bottom {
+  left: 22px;
+  right: 22px;
+  bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid rgba(22, 255, 72, 0.3);
+  padding-top: 8px;
+}
+
+.pip-card__stamp {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(230, 255, 232, 0.78);
+}
+
+.pip-card__digits {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
+
+.pip-card--premium {
+  background:
+    radial-gradient(circle at 84% 24%, rgba(124, 255, 143, 0.28), transparent 24%),
+    repeating-linear-gradient(135deg, rgba(22, 255, 72, 0.08) 0 8px, transparent 8px 16px),
+    linear-gradient(135deg, rgba(22, 255, 72, 0.2), rgba(22, 255, 72, 0.055) 48%, rgba(2, 6, 3, 0.96));
+}
+
+.pip-card--premium .pip-card__series {
+  color: #16ff48;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════
+   Pip-Boy Home variant
+═══════════════════════════════════════════════════════════ */
+
+.hs-root--pipboy {
+  --pip-canvas: #020603;
+  --pip-screen: #041407;
+  --pip-green: #16ff48;
+  --pip-green-soft: #7cff8f;
+  --pip-green-dim: #178a35;
+  --pip-ink: #e6ffe8;
+  --pip-muted: rgba(230, 255, 232, 0.82);
+  --pip-hairline: rgba(22, 255, 72, 0.26);
+  --pip-hairline-strong: rgba(22, 255, 72, 0.55);
+  background:
+    radial-gradient(circle at 50% 26%, rgba(22, 255, 72, 0.14), transparent 38%),
+    linear-gradient(180deg, #041407 0%, #020603 100%);
+  color: var(--pip-ink);
+  font-family: var(--font-mono);
+  position: relative;
+  overflow: hidden;
+}
+
+.hs-root--pipboy::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 16%, transparent 84%, rgba(0, 0, 0, 0.56)),
+    radial-gradient(circle at 50% 50%, transparent 0%, rgba(0, 0, 0, 0.38) 80%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 5px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hs-root--pipboy * {
+  font-family: 'Share Tech Mono', var(--font-mono);
+}
+
+.hs-root--pipboy .hs-header,
+.hs-root--pipboy .bottom-nav {
+  background: rgba(0, 0, 0, 0.24);
+  border-color: var(--pip-hairline);
+}
+
+.hs-root--pipboy .hs-header {
+  border-bottom: 1px solid var(--pip-hairline);
+}
+
+.hs-root--pipboy .hs-header__title,
+.hs-root--pipboy .hs-section-title,
+.hs-root--pipboy .bottom-nav__tab--active {
+  color: var(--pip-green);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px rgba(22, 255, 72, 0.32);
+}
+
+.hs-root--pipboy .icon-btn,
+.hs-root--pipboy .bottom-nav__tab,
+.hs-root--pipboy .hs-balance-label,
+.hs-root--pipboy .hs-balance-unit,
+.hs-root--pipboy .hs-activity-flat__msg,
+.hs-root--pipboy .hs-activity-flat__hint {
+  color: var(--pip-muted);
+}
+
+.hs-root--pipboy .hs-avatar {
+  background: transparent;
+  border: 1px solid var(--pip-hairline-strong);
+  color: var(--pip-green);
+}
+
+.hs-root--pipboy .hs-scroll,
+.hs-root--pipboy .hs-header,
+.hs-root--pipboy .bottom-nav,
+.hs-root--pipboy .yield-backdrop {
+  position: relative;
+  z-index: 4;
+}
+
+.hs-root--pipboy .hs-balance-amount {
+  color: var(--pip-green);
+  letter-spacing: 0;
+  text-shadow: 0 0 16px rgba(22, 255, 72, 0.32);
+}
+
+.hs-root--pipboy .hs-pill {
+  border-radius: 0;
+  border: 1px solid var(--pip-hairline-strong);
+  background: rgba(22, 255, 72, 0.07);
+  color: var(--pip-green);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hs-root--pipboy .hs-pill--primary {
+  background: var(--pip-green);
+  color: #020603;
+}
+
+.hs-pipboy-status {
+  margin: 8px 16px 0;
+  border: 1px solid var(--pip-hairline);
+  padding: 7px 10px;
+  color: var(--pip-green);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hs-pipboy-status__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.hs-pipboy-card-unlock {
+  border: none;
+  background: transparent;
+  padding: 0;
+  position: relative;
+}
+
+.hs-pipboy-switch {
+  width: 100%;
+  margin-top: 10px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--pip-hairline-strong);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--pip-green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.hs-pipboy-card-unlock__card {
+  min-height: 168px;
+}
+
+.hs-root--pipboy .hs-yield-empty,
+.hs-root--pipboy .hs-yield-active {
+  background: rgba(22, 255, 72, 0.05);
+  border-color: var(--pip-hairline);
+  border-radius: 0;
+}
+
+.hs-root--pipboy .hs-yield-empty__title,
+.hs-root--pipboy .hs-yield-active__provider,
+.hs-root--pipboy .hs-yield-active__row span:last-child {
+  color: var(--pip-ink);
+}
+
+.hs-root--pipboy .hs-yield-empty__sub,
+.hs-root--pipboy .hs-yield-active__row span:first-child {
+  color: var(--pip-muted);
+}
+
+.hs-root--pipboy .hs-yield-empty__icon,
+.hs-root--pipboy .hs-yield-empty__cta,
+.hs-root--pipboy .hs-apy-badge {
+  background: rgba(22, 255, 72, 0.09);
+  border-color: var(--pip-hairline-strong);
+  color: var(--pip-green);
+  border-radius: 0;
+}
+
+.hs-root--pipboy .hs-yield-empty__cta {
+  background: var(--pip-green);
+  color: #020603;
+}
+
+/* ═══════════════════════════════════════════════════════════
    Earn screen  (earn-*)
 ═══════════════════════════════════════════════════════════ */
 
