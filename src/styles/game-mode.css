@@ -347,41 +347,50 @@
   height: auto;
   display: block;
   object-fit: contain;
+  aspect-ratio: 1 / 1;
 }
 .gm-asset-image--email {
   width: min(76vw, 292px);
 }
+.gm-asset-image--email img { aspect-ratio: 720 / 588; }
 .gm-asset-image--otp-signal {
   width: min(78vw, 300px);
   margin-bottom: -6px;
 }
+.gm-asset-image--otp-signal img { aspect-ratio: 720 / 509; }
 .gm-asset-image--signal {
   width: min(88vw, 360px);
   margin-top: -4px;
   margin-bottom: -6px;
 }
+.gm-asset-image--signal img { aspect-ratio: 720 / 509; }
 .gm-asset-image--stamp {
   width: min(82vw, 318px);
   margin-bottom: -4px;
 }
+.gm-asset-image--stamp img { aspect-ratio: 720 / 554; }
 .gm-asset-image--banking {
   width: min(76vw, 292px);
   margin-bottom: -4px;
 }
+.gm-asset-image--banking img { aspect-ratio: 1 / 1; }
 .gm-asset-image--map {
   width: min(78vw, 300px);
   margin-bottom: -6px;
 }
+.gm-asset-image--map img { aspect-ratio: 720 / 523; }
 .gm-asset-image--funding-crypto {
   width: min(76vw, 286px);
   margin-top: -4px;
   margin-bottom: -8px;
 }
+.gm-asset-image--funding-crypto img { aspect-ratio: 1 / 1; }
 .gm-asset-image--crypto {
   width: min(74vw, 268px);
   margin-top: -4px;
   margin-bottom: -6px;
 }
+.gm-asset-image--crypto img { aspect-ratio: 1 / 1; }
 
 /* ── Transmission tower illustration ─────────────────────── */
 
@@ -839,7 +848,7 @@
   border-top-color: rgba(22, 255, 72, 0.78);
   border-bottom-color: rgba(22, 255, 72, 0.78);
   background: var(--pip-green);
-  color: #020603;
+  color: #000000;
 }
 .gm-choice-indicator {
   width: 18px;
@@ -868,7 +877,7 @@
   margin-bottom: 3px;
 }
 .gm-choice-card--active .gm-choice-title {
-  color: #020603;
+  color: #000000;
 }
 .gm-choice-sub {
   font-size: 9px;
@@ -876,7 +885,7 @@
   color: var(--color-muted);
 }
 .gm-choice-card--active .gm-choice-sub {
-  color: rgba(2, 6, 3, 0.72);
+  color: rgba(0, 0, 0, 0.88);
 }
 .gm-choice-badge {
   font-size: 9px;
@@ -887,8 +896,8 @@
   flex-shrink: 0;
 }
 .gm-choice-card--active .gm-choice-badge {
-  color: #020603;
-  border-color: rgba(2, 6, 3, 0.42);
+  color: #000000;
+  border-color: rgba(0, 0, 0, 0.45);
 }
 
 /* ── OTP boxes ─────────────────────────────────────────────── */
