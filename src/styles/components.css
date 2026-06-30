@@ -3313,6 +3313,27 @@
 
 .onb-address-copy:active { background: var(--color-surface-subtle); }
 
+/* ── QR code card ──────────────────────── */
+
+.onb-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: #FFFFFF;
+  border-radius: var(--radius-xl);
+  margin-bottom: 20px;
+}
+
+.onb-qr-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0A0A09;
+  font-family: var(--font-body);
+  letter-spacing: 0.01em;
+}
+
 /* ── Info table ────────────────────────── */
 
 .onb-info-table {
@@ -3629,6 +3650,8 @@
   display: flex;
   flex-direction: column;
   background: var(--color-surface);
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Header ────────────────────────────── */
