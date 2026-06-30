@@ -6,6 +6,7 @@ import { Button } from './components/Button'
 import { useOnboarding } from './hooks/useOnboarding'
 import { OnboardingFlow } from './flows/onboarding/OnboardingFlow'
 import { GameOnboardingFlow } from './flows/onboarding/GameOnboardingFlow'
+import svLogo from './img/SVlogo.svg'
 import './App.css'
 import './styles/game-mode.css'
 
@@ -34,7 +35,7 @@ function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMod
         </span>
       </button>
       <div className="landing-hero">
-        <div className="landing-logo">ShieldVault</div>
+        <img src={svLogo} alt="ShieldVault" className="landing-logo" />
         <div className="landing-tagline">
           Private payments with automatic yield on every dollar
         </div>

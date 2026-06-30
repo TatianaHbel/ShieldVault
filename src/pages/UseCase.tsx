@@ -6,7 +6,7 @@ import { Button } from '../components/Button'
 type Actor = 'user' | 'system' | 'done' | 'error'
 
 const COL: Record<Actor, string> = {
-  user:   '#E8C93A',
+  user:   '#EBFC0E',
   system: '#888888',
   done:   '#22C55E',
   error:  '#EF4444',
@@ -388,7 +388,7 @@ function FlowMap() {
           <path d={dropArc(payMain[2], payFailed)} stroke="#EF4444" strokeWidth="1" fill="none" strokeDasharray="4,3" opacity={0.4} markerEnd="url(#sv-e)" />
 
           {[
-            { label: 'ONBOARDING', x: MAIN_X, y: OB_Y - NH / 2 - 22, color: '#E8C93A' },
+            { label: 'ONBOARDING', x: MAIN_X, y: OB_Y - NH / 2 - 22, color: '#EBFC0E' },
             { label: 'PAYMENT',    x: px(0),  y: PAY_Y - NH / 2 - 22, color: '#22C55E' },
           ].map(({ label, x, y, color }) => (
             <g key={label}>
@@ -571,8 +571,8 @@ function ColorSection() {
     <div>
       <SwatchGroup label="Brand">
         <ColorRow swatches={[
-          { token: '--color-primary',          hex: '#E8C93A', note: 'Warm Gold' },
-          { token: '--color-primary-active',   hex: '#D4B530', note: 'Pressed state' },
+          { token: '--color-primary',          hex: '#EBFC0E', note: 'Warm Gold' },
+          { token: '--color-primary-active',   hex: '#D4E40C', note: 'Pressed state' },
           { token: '--color-primary-disabled', hex: '#3A3220', note: 'Disabled fill' },
           { token: '--color-on-primary',       hex: '#0A0A09', note: 'Text on gold' },
         ]} />
