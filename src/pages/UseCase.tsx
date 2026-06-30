@@ -3,6 +3,7 @@ import { Signal, Wifi, Battery } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 import SVLogo from '../img/SVlogo.svg'
 import LogoPng from '../img/logo.png'
+import PersonaPhoto from '../img/landing/magnific_editorial-photography-for_kLfTkya16B.png'
 import { Button } from '../components/Button'
 import { OnboardingFlow } from '../flows/onboarding/OnboardingFlow'
 import type { OnboardingData } from '../hooks/useOnboarding'
@@ -1117,7 +1118,9 @@ const NAV = [
   {
     group: 'Flows',
     items: [
+      { id: 'user',       label: 'Who is this for' },
       { id: 'flow-map',   label: 'Flow map' },
+      { id: 'problems',   label: 'Problems solved' },
       { id: 'screens',    label: 'Screen gallery' },
       { id: 'onboarding', label: 'Onboarding phases' },
       { id: 'payment',    label: 'Payment flow' },
@@ -1357,6 +1360,90 @@ export function UseCase() {
               A retail payment account backed by blockchain — users never see wallets, gas, or signing flows.
             </p>
           </div>
+
+          {/* ── WHO IS THIS FOR ── */}
+
+          <section id="user" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>00</span>
+              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Who is this for</h2>
+            </div>
+            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 36px', lineHeight: 1.7 }}>
+              ShieldVault is designed for people who want their money to work harder — without learning anything new.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 40, alignItems: 'start' }}>
+
+              {/* Photo */}
+              <div style={{
+                borderRadius: 20,
+                overflow: 'hidden',
+                height: 340,
+                background: 'var(--color-surface-card)',
+                border: '1px solid var(--color-hairline)',
+                flexShrink: 0,
+              }}>
+                <img
+                  src={PersonaPhoto}
+                  alt="Maria Garcia"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
+                />
+              </div>
+
+              {/* Persona details */}
+              <div>
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 4 }}>Maria Garcia</div>
+                  <div style={{ fontSize: 14, color: 'var(--color-muted)' }}>32 — Senior Marketing Manager — Madrid, Spain</div>
+                </div>
+
+                {/* Tags */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
+                  {['Revolut user', 'No crypto knowledge', 'Privacy-conscious', 'EU resident', 'Saving at 0.5% APY'].map(tag => (
+                    <span key={tag} style={{
+                      padding: '4px 12px', borderRadius: 99,
+                      background: 'var(--color-surface-elevated)',
+                      border: '1px solid var(--color-hairline)',
+                      fontSize: 12, color: 'var(--color-body)',
+                    }}>{tag}</span>
+                  ))}
+                </div>
+
+                {/* Pain points + goals */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div style={{ background: 'var(--color-surface-card)', border: '1px solid var(--color-hairline)', borderRadius: 14, padding: '20px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-error)', marginBottom: 14 }}>Pain points</div>
+                    {[
+                      'Savings earn almost nothing at the bank',
+                      'Crypto is too complex to even start',
+                      'No privacy in digital payments',
+                      'Multiple apps for spending and saving',
+                    ].map(p => (
+                      <div key={p} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+                        <span style={{ color: 'var(--color-error)', fontSize: 14, lineHeight: 1, marginTop: 2, flexShrink: 0 }}>×</span>
+                        <span style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.5 }}>{p}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ background: 'var(--color-surface-card)', border: '1px solid var(--color-hairline)', borderRadius: 14, padding: '20px' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-success)', marginBottom: 14 }}>What she wants</div>
+                    {[
+                      'Money earning without any effort',
+                      'One card for everything, worldwide',
+                      'Financial privacy without complexity',
+                      'Set it, forget it — just works',
+                    ].map(g => (
+                      <div key={g} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+                        <span style={{ color: 'var(--color-success)', fontSize: 14, lineHeight: 1, marginTop: 2, flexShrink: 0 }}>✓</span>
+                        <span style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.5 }}>{g}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
 
           {/* ── FLOWS ── */}
 
