@@ -183,9 +183,9 @@ component specs, copy rules, and generation rules live there. This section is a 
 
 **Dark mode only.** `styles/tokens.css` must match `docs/DESIGN.md` token values.
 
-**Brand color:** `#E8C93A` — warm gold. Natural light through glass. Never electric or neon.
+**Brand color:** `#EBFC0E` — electric lime. High-contrast accent on near-black. Never pastel or muted.
 
-**Color palette:** Near-black canvas (`#0A0A09`), warm gold (`#E8C93A`), white text. No blue.
+**Color palette:** Near-black canvas (`#0A0A09`), electric lime (`#EBFC0E`), white text. No blue.
 
 **Motion:** Framer Motion, slow ease-out only. `cubic-bezier(0.16, 1, 0.3, 1)`.
 No spring bounce, no elastic easing. Animations communicate state — they do not decorate.

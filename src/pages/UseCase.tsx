@@ -1,19 +1,26 @@
 import { useRef, useState, useEffect } from 'react'
+import { Signal, Wifi, Battery } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+import SVLogo from '../img/SVlogo.svg'
+import LogoPng from '../img/logo.png'
 import { Button } from '../components/Button'
+import { OnboardingFlow } from '../flows/onboarding/OnboardingFlow'
+import type { OnboardingData } from '../hooks/useOnboarding'
+import type { OnboardingStep } from '../types/index'
 
 // ── Actor config ──────────────────────────────────────────────────────────────
 
 type Actor = 'user' | 'system' | 'done' | 'error'
 
 const COL: Record<Actor, string> = {
-  user:   '#E8C93A',
+  user:   '#EBFC0E',
   system: '#888888',
   done:   '#22C55E',
   error:  '#EF4444',
 }
 
 const FMBG: Record<Actor, string> = {
-  user:   'rgba(232,201,58,0.08)',
+  user:   'rgba(235,252,14,0.08)',
   system: 'rgba(136,136,136,0.06)',
   done:   'rgba(34,197,94,0.08)',
   error:  'rgba(239,68,68,0.07)',
@@ -43,6 +50,250 @@ interface FN {
 
 const nodeW = (n: FN) => n.variant === 'main' ? 175 : n.variant === 'fork' ? 160 : 130
 const nodeH = (n: FN) => n.variant === 'main' ? 132 : n.variant === 'fork' ? 112 : 48
+
+// ── Screen preview ────────────────────────────────────────────────────────────
+
+const PREVIEW_STEPS: { phase: OnboardingStep; label: string; desc: string }[] = [
+  { phase: 'email',             label: 'Account',       desc: 'Email sign-in or SSO via Google / Apple. KYC notice shown upfront so users know what to expect.' },
+  { phase: 'email_verification',label: 'Email code',    desc: '6-digit OTP sent automatically. Auto-submits on completion. Resend available after 30 seconds.' },
+  { phase: 'identity_name',     label: 'Full name',     desc: 'First and last name exactly as they appear on the government-issued ID.' },
+  { phase: 'identity_dob',      label: 'Date of birth', desc: 'Day, month, year selector. Must match the ID document submitted in the next step.' },
+  { phase: 'identity_address',  label: 'Home address',  desc: 'Street address, city, postal code, and country. 26 EU countries supported via searchable picker.' },
+  { phase: 'passport',          label: 'ID document',   desc: 'Passport, national ID, or driving licence. Tap to photo or upload. JPEG/PNG up to 10 MB.' },
+  { phase: 'kyc_review',        label: 'KYC review',    desc: 'Partner service reviews the document automatically. Usually a few seconds. User can close the app and is notified on completion.' },
+  { phase: 'tos',               label: 'Terms',         desc: 'Terms of Service and Privacy Policy. Trust-forward copy and single-tap acceptance.' },
+  { phase: 'funding',           label: 'Deposit method',desc: '$50 minimum to activate the account. User chooses between sending crypto or funding via bank transfer / card.' },
+  { phase: 'funding_crypto',    label: 'Crypto deposit', desc: 'EIP-681 QR code pre-fills 50 USDC in any Ethereum wallet. Copy-to-clipboard fallback for the deposit address.' },
+  { phase: 'funding_fiat',      label: 'Bank / card',   desc: 'Bank transfer (free, 1 to 3 business days) or credit/debit card (instant, small processing fee).' },
+  { phase: 'processing',        label: 'Processing',    desc: 'Deposit confirmation spinner. Auto-advances in ~5 seconds. User can close the app safely.' },
+  { phase: 'card_selection',    label: 'Card tier',     desc: 'VISA PREMIER (free) or PREMIUM ($2/month). Toggle tabs to compare perks. Upgrade available anytime after onboarding.' },
+  { phase: 'completing',        label: 'All set',        desc: 'ShieldVault check animation, $50 balance shown, and 4.2% APY confirmed. One tap to reach the home screen.' },
+]
+
+const SCALE = 0.60
+const PHONE_W = 390
+const PHONE_H = 844
+
+const DEMO_DATA: OnboardingData = {
+  email: 'maria@example.com',
+  firstName: 'Maria',
+  lastName: 'Garcia',
+  dateOfBirth: '1990-05-15',
+  addressLine: 'Calle Mayor 12, 3A',
+  city: 'Madrid',
+  postalCode: '28001',
+  country: 'ES',
+  fundingStream: null,
+  fiatMethod: null,
+  cardTier: null,
+}
+
+function ScreenPreview() {
+  const [stepIdx, setStepIdx] = useState(0)
+  const pillsRef = useRef<HTMLDivElement>(null)
+
+  const step = PREVIEW_STEPS[stepIdx]
+  const phase = step.phase
+
+  const goTo = (idx: number) => {
+    const clamped = Math.max(0, Math.min(PREVIEW_STEPS.length - 1, idx))
+    setStepIdx(clamped)
+    const el = pillsRef.current?.children[clamped] as HTMLElement | undefined
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }
+
+  const handleAdvance = (nextPhase: OnboardingStep | 'idle') => {
+    if (nextPhase === 'completed' || nextPhase === 'idle') return
+    const idx = PREVIEW_STEPS.findIndex(s => s.phase === nextPhase)
+    if (idx >= 0) goTo(idx)
+  }
+
+  const handleBack = () => goTo(Math.max(0, stepIdx - 1))
+
+  const isFirst = stepIdx === 0
+  const isLast  = stepIdx === PREVIEW_STEPS.length - 1
+
+  return (
+    <div style={{ fontFamily: 'Inter, sans-serif' }}>
+
+      {/* Step filmstrip */}
+      <div
+        ref={pillsRef}
+        style={{
+          display: 'flex',
+          gap: 6,
+          overflowX: 'auto',
+          paddingBottom: 4,
+          marginBottom: 32,
+          scrollbarWidth: 'none',
+        }}
+      >
+        {PREVIEW_STEPS.map((s, i) => (
+          <button
+            key={s.phase}
+            onClick={() => goTo(i)}
+            style={{
+              flexShrink: 0,
+              padding: '5px 12px',
+              borderRadius: 99,
+              border: `1px solid ${i === stepIdx ? 'var(--color-primary)' : 'var(--color-hairline)'}`,
+              background: i === stepIdx ? 'var(--color-glass-tint-strong)' : 'transparent',
+              color: i === stepIdx ? 'var(--color-primary)' : i < stepIdx ? 'var(--color-body)' : 'var(--color-muted)',
+              fontSize: 11,
+              fontWeight: i === stepIdx ? 700 : 500,
+              cursor: 'pointer',
+              fontFamily: 'Inter, sans-serif',
+              transition: 'all 120ms ease',
+            }}
+          >
+            {i + 1}. {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Phone + side panel */}
+      <div style={{ display: 'flex', gap: 52, alignItems: 'flex-start' }}>
+
+        {/* Scaled phone frame */}
+        <div style={{
+          width: PHONE_W * SCALE + 32,
+          height: PHONE_H * SCALE + 32,
+          position: 'relative',
+          flexShrink: 0,
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: 16,
+            left: 16,
+            width: PHONE_W,
+            height: PHONE_H,
+            transformOrigin: 'top left',
+            transform: `scale(${SCALE})`,
+          }}>
+            <div style={{
+              width: PHONE_W,
+              height: PHONE_H,
+              background: 'var(--color-surface-card)',
+              borderRadius: 44,
+              overflow: 'hidden',
+              boxShadow: '0 0 0 1px rgba(255,255,255,0.06), 0 0 0 10px #111111, 0 0 0 11px rgba(255,255,255,0.04), 0 40px 100px rgba(0,0,0,0.9)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              {/* Status bar */}
+              <div style={{
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 28px',
+                flexShrink: 0,
+                background: 'var(--color-surface-card)',
+                fontSize: 15,
+                fontWeight: 600,
+                fontFamily: 'Inter, sans-serif',
+                color: 'var(--color-ink)',
+                letterSpacing: '-0.01em',
+              }}>
+                <span>9:41</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--color-ink)' }}>
+                  <Signal size={14} strokeWidth={2} />
+                  <Wifi size={14} strokeWidth={2} />
+                  <Battery size={14} strokeWidth={2} />
+                </span>
+              </div>
+
+              {/* App layer */}
+              <div className="app-layer">
+                <OnboardingFlow
+                  key={phase}
+                  phase={phase}
+                  data={DEMO_DATA}
+                  advance={handleAdvance}
+                  back={handleBack}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right panel: step info + controls */}
+        <div style={{ flex: 1, minWidth: 0, paddingTop: 20 }}>
+          <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 8 }}>
+            Step {stepIdx + 1} of {PREVIEW_STEPS.length}
+          </div>
+          <h3 style={{ margin: '0 0 12px', fontSize: 24, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            {step.label}
+          </h3>
+          <p style={{ margin: '0 0 36px', fontSize: 15, color: 'var(--color-body)', lineHeight: 1.75, maxWidth: 360 }}>
+            {step.desc}
+          </p>
+
+          {/* Prev / Next */}
+          <div style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
+            <button
+              onClick={() => goTo(stepIdx - 1)}
+              disabled={isFirst}
+              style={{
+                padding: '11px 22px',
+                border: '1px solid var(--color-hairline)',
+                borderRadius: 9,
+                background: 'transparent',
+                color: isFirst ? 'var(--color-muted-soft)' : 'var(--color-body)',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: isFirst ? 'not-allowed' : 'pointer',
+                fontFamily: 'Inter, sans-serif',
+                transition: 'all 120ms ease',
+              }}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => goTo(stepIdx + 1)}
+              disabled={isLast}
+              style={{
+                padding: '11px 22px',
+                border: `1px solid ${isLast ? 'var(--color-hairline)' : 'transparent'}`,
+                borderRadius: 9,
+                background: isLast ? 'transparent' : 'var(--color-primary)',
+                color: isLast ? 'var(--color-muted-soft)' : '#0A0A09',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: isLast ? 'not-allowed' : 'pointer',
+                fontFamily: 'Inter, sans-serif',
+                transition: 'all 120ms ease',
+              }}
+            >
+              {isLast ? 'End of flow' : 'Next step'}
+            </button>
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+            {PREVIEW_STEPS.map((_, i) => (
+              <div
+                key={i}
+                onClick={() => goTo(i)}
+                style={{
+                  height: 4,
+                  width: i === stepIdx ? 28 : 4,
+                  borderRadius: 99,
+                  background: i <= stepIdx ? 'var(--color-primary)' : 'var(--color-hairline-strong)',
+                  cursor: 'pointer',
+                  transition: 'width 200ms cubic-bezier(0.16, 1, 0.3, 1), background 120ms ease',
+                  flexShrink: 0,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
 
 // ── FlowMap ───────────────────────────────────────────────────────────────────
 
@@ -388,7 +639,7 @@ function FlowMap() {
           <path d={dropArc(payMain[2], payFailed)} stroke="#EF4444" strokeWidth="1" fill="none" strokeDasharray="4,3" opacity={0.4} markerEnd="url(#sv-e)" />
 
           {[
-            { label: 'ONBOARDING', x: MAIN_X, y: OB_Y - NH / 2 - 22, color: '#E8C93A' },
+            { label: 'ONBOARDING', x: MAIN_X, y: OB_Y - NH / 2 - 22, color: '#EBFC0E' },
             { label: 'PAYMENT',    x: px(0),  y: PAY_Y - NH / 2 - 22, color: '#22C55E' },
           ].map(({ label, x, y, color }) => (
             <g key={label}>
@@ -571,7 +822,7 @@ function ColorSection() {
     <div>
       <SwatchGroup label="Brand">
         <ColorRow swatches={[
-          { token: '--color-primary',          hex: '#E8C93A', note: 'Warm Gold' },
+          { token: '--color-primary',          hex: '#EBFC0E', note: 'Electric Lime' },
           { token: '--color-primary-active',   hex: '#D4B530', note: 'Pressed state' },
           { token: '--color-primary-disabled', hex: '#3A3220', note: 'Disabled fill' },
           { token: '--color-on-primary',       hex: '#0A0A09', note: 'Text on gold' },
@@ -600,8 +851,8 @@ function ColorSection() {
           { token: '--color-hairline',          hex: '#2A2A28', note: 'Default border' },
           { token: '--color-hairline-strong',   hex: '#3A3A36', note: 'Emphasis border' },
           { token: '--color-glass-bg',          hex: 'rgba(255,255,255,0.04)', note: 'Base fill' },
-          { token: '--color-glass-tint',        hex: 'rgba(232,201,58,0.06)', note: 'Gold tint' },
-          { token: '--color-glass-tint-strong', hex: 'rgba(232,201,58,0.12)', note: 'Selected' },
+          { token: '--color-glass-tint',        hex: 'rgba(235,252,14,0.06)', note: 'Gold tint' },
+          { token: '--color-glass-tint-strong', hex: 'rgba(235,252,14,0.12)', note: 'Selected' },
         ]} />
       </SwatchGroup>
       <SwatchGroup label="Semantic">
@@ -730,8 +981,8 @@ function SpacingSection() {
 function GlassSection() {
   const cards = [
     { label: 'glass-bg',           bg: 'rgba(255,255,255,0.04)', border: 'rgba(255,255,255,0.08)',  desc: 'Base glass — neutral, universal' },
-    { label: 'glass-tint',         bg: 'rgba(232,201,58,0.06)',  border: 'rgba(255,255,255,0.08)',  desc: 'Gold tint — default card state' },
-    { label: 'glass-tint-strong',  bg: 'rgba(232,201,58,0.12)',  border: 'rgba(255,255,255,0.14)',  desc: 'Strong tint — selected or active' },
+    { label: 'glass-tint',         bg: 'rgba(235,252,14,0.06)',  border: 'rgba(255,255,255,0.08)',  desc: 'Gold tint — default card state' },
+    { label: 'glass-tint-strong',  bg: 'rgba(235,252,14,0.12)',  border: 'rgba(255,255,255,0.14)',  desc: 'Strong tint — selected or active' },
     { label: 'surface-card',       bg: '#1A1A18',               border: 'rgba(255,255,255,0.08)',  desc: 'Opaque card — balance, lists' },
     { label: 'surface-elevated',   bg: '#242422',               border: 'rgba(255,255,255,0.08)',  desc: 'Elevated — tooltips, FAB context' },
   ]
@@ -784,7 +1035,7 @@ function MotionSection() {
             style={{
               padding: '16px',
               background: active === i ? 'var(--color-glass-tint-strong)' : 'var(--color-surface-card)',
-              border: `1px solid ${active === i ? 'rgba(232,201,58,0.3)' : 'var(--color-hairline)'}`,
+              border: `1px solid ${active === i ? 'rgba(235,252,14,0.3)' : 'var(--color-hairline)'}`,
               borderRadius: 12,
               cursor: 'pointer',
               transition: 'all 150ms ease',
@@ -867,6 +1118,7 @@ const NAV = [
     group: 'Flows',
     items: [
       { id: 'flow-map',   label: 'Flow map' },
+      { id: 'screens',    label: 'Screen gallery' },
       { id: 'onboarding', label: 'Onboarding phases' },
       { id: 'payment',    label: 'Payment flow' },
       { id: 'copy-rules', label: 'Copy rules' },
@@ -891,6 +1143,7 @@ const ALL_IDS = NAV.flatMap(g => g.items.map(i => i.id))
 
 export function UseCase() {
   const [active, setActive] = useState('flow-map')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -922,60 +1175,174 @@ export function UseCase() {
 
       {/* Sidebar */}
       <nav style={{
-        width: 220,
+        width: sidebarOpen ? 220 : 64,
         flexShrink: 0,
         position: 'sticky',
         top: 0,
         height: '100vh',
         overflowY: 'auto',
+        overflowX: 'hidden',
         background: 'var(--color-surface-soft)',
         borderRight: '1px solid var(--color-hairline)',
-        padding: '28px 0 40px',
         display: 'flex',
         flexDirection: 'column',
+        transition: 'width 280ms cubic-bezier(0.16, 1, 0.3, 1)',
       }}>
-        <div style={{ padding: '0 20px 24px', borderBottom: '1px solid var(--color-hairline)', marginBottom: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.01em', marginBottom: 3 }}>ShieldVault</div>
-          <div style={{ fontSize: 11, color: 'var(--color-muted)' }}>Design reference</div>
-        </div>
-
-        {NAV.map(({ group, items }) => (
-          <div key={group} style={{ padding: '0 10px', marginBottom: 20 }}>
-            <div style={{
-              fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.1em', color: 'var(--color-muted-soft)',
-              padding: '0 8px', marginBottom: 4,
-            }}>
-              {group}
-            </div>
-            {items.map(({ id, label }) => (
+        {sidebarOpen ? (
+          <>
+            {/* Expanded header */}
+            <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid var(--color-hairline)', marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <img src={SVLogo} alt="ShieldVault" style={{ flex: 1, minWidth: 0, height: 'auto', objectFit: 'contain' }} />
               <button
-                key={id}
-                onClick={() => scrollTo(id)}
+                onClick={() => setSidebarOpen(false)}
+                title="Collapse sidebar"
                 style={{
-                  width: '100%', textAlign: 'left',
-                  padding: '7px 10px', borderRadius: 7,
-                  border: 'none',
-                  background: active === id ? 'var(--color-glass-tint-strong)' : 'transparent',
-                  color: active === id ? 'var(--color-primary)' : 'var(--color-body)',
-                  fontSize: 13,
-                  fontWeight: active === id ? 600 : 400,
-                  cursor: 'pointer',
-                  fontFamily: 'Inter, sans-serif',
-                  display: 'block',
-                  lineHeight: 1.4,
+                  flexShrink: 0, width: 28, height: 28, borderRadius: 6,
+                  border: '1px solid var(--color-hairline)',
+                  background: 'transparent', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: 'var(--color-muted)',
                 }}
               >
-                {label}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
               </button>
+            </div>
+
+            {/* Nav items */}
+            {NAV.map(({ group, items }) => (
+              <div key={group} style={{ padding: '0 10px', marginBottom: 20 }}>
+                <div style={{
+                  fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
+                  letterSpacing: '0.1em', color: 'var(--color-muted-soft)',
+                  padding: '0 8px', marginBottom: 4,
+                }}>
+                  {group}
+                </div>
+                {items.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => scrollTo(id)}
+                    style={{
+                      width: '100%', textAlign: 'left',
+                      padding: '7px 10px', borderRadius: 7,
+                      border: 'none',
+                      background: active === id ? 'var(--color-glass-tint-strong)' : 'transparent',
+                      color: active === id ? 'var(--color-primary)' : 'var(--color-body)',
+                      fontSize: 13,
+                      fontWeight: active === id ? 600 : 400,
+                      cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif',
+                      display: 'block',
+                      lineHeight: 1.4,
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             ))}
+          </>
+        ) : (
+          /* Collapsed state */
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 20, gap: 16 }}>
+            <img src={LogoPng} alt="ShieldVault" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <button
+              onClick={() => setSidebarOpen(true)}
+              title="Open sidebar"
+              style={{
+                width: 36, height: 36, borderRadius: 8,
+                border: '1px solid var(--color-hairline)',
+                background: 'transparent', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--color-muted)',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
           </div>
-        ))}
+        )}
       </nav>
 
       {/* Main content */}
       <main style={{ flex: 1, minWidth: 0, padding: '64px 72px 120px' }}>
         <div style={{ maxWidth: 900 }}>
+
+          {/* ── Presentation intro ── */}
+          <div style={{ marginBottom: 72, paddingBottom: 72, borderBottom: '1px solid var(--color-hairline)' }}>
+            <img
+              src={LogoPng}
+              alt="ShieldVault"
+              style={{ height: 160, width: 'auto', display: 'block', marginBottom: 40, objectFit: 'contain' }}
+            />
+            <h1 style={{
+              margin: '0 0 24px',
+              fontSize: 56,
+              fontWeight: 800,
+              color: 'var(--color-ink)',
+              letterSpacing: '-0.04em',
+              lineHeight: 1.04,
+              maxWidth: 740,
+            }}>
+              What if your payment account<br />did more?
+            </h1>
+            <p style={{
+              fontSize: 18,
+              color: 'var(--color-body)',
+              lineHeight: 1.75,
+              margin: 0,
+              maxWidth: 580,
+            }}>
+              Most people{"'"}s money sits in a current account earning almost nothing.
+              ShieldVault changes that — automatically, silently, and privately.
+              A payment account with a VISA card that yields from day one.
+            </p>
+          </div>
+
+          {/* QR code — try it on your phone */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 36,
+            background: 'var(--color-glass-tint)',
+            border: '1px solid rgba(235,252,14,0.25)',
+            borderRadius: 16,
+            padding: '28px 36px',
+            marginBottom: 56,
+          }}>
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: 12,
+              padding: 12,
+              flexShrink: 0,
+            }}>
+              <QRCodeSVG
+                value="https://shieldvault.netlify.app"
+                size={120}
+                bgColor="#FFFFFF"
+                fgColor="#0A0A09"
+                level="M"
+              />
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 8 }}>
+                Try it on your phone
+              </div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 8 }}>
+                Scan to open ShieldVault
+              </div>
+              <div style={{ fontSize: 14, color: 'var(--color-body)', lineHeight: 1.6, marginBottom: 12 }}>
+                Live prototype — full onboarding flow, VISA card selection, and auto-yield.
+                No install required.
+              </div>
+              <div style={{ fontSize: 13, fontFamily: 'monospace', color: 'var(--color-muted)', letterSpacing: '0.01em' }}>
+                shieldvault.netlify.app
+              </div>
+            </div>
+          </div>
 
           {/* Page header */}
           <div style={{ marginBottom: 72 }}>
@@ -1012,9 +1379,21 @@ export function UseCase() {
             <FlowMap />
           </section>
 
-          <section id="onboarding" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+          <section id="screens" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>02</span>
+              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Screen gallery</h2>
+            </div>
+            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
+              Interactive walkthrough of every onboarding step. Click through the tabs or use the navigation buttons.
+              Screens with automatic transitions (KYC review, deposit processing) will advance on their own after a few seconds.
+            </p>
+            <ScreenPreview />
+          </section>
+
+          <section id="onboarding" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>03</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Onboarding phases</h2>
             </div>
             <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 28px', lineHeight: 1.7 }}>
@@ -1073,7 +1452,7 @@ export function UseCase() {
 
           <section id="payment" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>03</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>04</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Payment flow</h2>
             </div>
             <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
@@ -1110,7 +1489,7 @@ export function UseCase() {
 
           <section id="copy-rules" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>04</span>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>05</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Copy rules</h2>
             </div>
             <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>

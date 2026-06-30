@@ -1,9 +1,9 @@
 :root {
   /* ── Brand — Warm Gold ────────────────────────────────── */
-  --color-primary:          #E8C93A;
-  --color-primary-active:   #D4B530;
-  --color-primary-disabled: #3A3220;
-  --color-primary-glow:     rgba(232, 201, 58, 0.10);
+  --color-primary:          #EBFC0E;
+  --color-primary-active:   #CADF0C;
+  --color-primary-disabled: #2A3300;
+  --color-primary-glow:     rgba(235, 252, 14, 0.10);
   --color-on-primary:       #0A0A09;
 
   /* Alias — legacy code references --color-blue */
@@ -46,8 +46,8 @@
   --color-glass-bg:            rgba(255, 255, 255, 0.04);
   --color-glass-border:        rgba(255, 255, 255, 0.08);
   --color-glass-border-strong: rgba(255, 255, 255, 0.14);
-  --color-glass-tint:          rgba(232, 201, 58, 0.06);
-  --color-glass-tint-strong:   rgba(232, 201, 58, 0.12);
+  --color-glass-tint:          rgba(235, 252, 14, 0.06);
+  --color-glass-tint-strong:   rgba(235, 252, 14, 0.12);
 
   /* ── Semantic ─────────────────────────────────────────── */
   --color-success:    #22C55E;
