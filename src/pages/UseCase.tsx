@@ -1063,6 +1063,7 @@ const NAV = [
     group: 'Flows',
     items: [
       { id: 'user',       label: 'Who is this for' },
+      { id: 'yield',      label: 'Auto-yield' },
       { id: 'flow-map',   label: 'Flow map' },
       { id: 'problems',   label: 'Problems solved' },
       { id: 'screens',    label: 'Screen gallery' },
@@ -1381,6 +1382,104 @@ export function UseCase() {
             </div>
           </section>
 
+          {/* QR code — try it on your phone */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 36,
+            background: 'var(--color-glass-tint)',
+            border: '1px solid rgba(235,252,14,0.25)',
+            borderRadius: 16,
+            padding: '28px 36px',
+            marginBottom: 96,
+          }}>
+            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 12, flexShrink: 0 }}>
+              <QRCodeSVG value="https://shieldvault.netlify.app" size={96} bgColor="#FFFFFF" fgColor="#0A0A09" level="M" />
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 6 }}>
+                Try it on your phone
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 6 }}>
+                Scan to walk through the flow
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.6, marginBottom: 8 }}>
+                Live prototype. Full onboarding flow, VISA card selection, auto-yield. No install required.
+              </div>
+              <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'var(--color-muted)' }}>
+                shieldvault.netlify.app
+              </div>
+            </div>
+          </div>
+
+          {/* ── AUTO-YIELD ── */}
+
+          <section id="yield" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Bonus</span>
+              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Auto-yield system</h2>
+            </div>
+            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 28px', lineHeight: 1.7, maxWidth: 640 }}>
+              Every month the account balance generates a small return automatically.
+              There is no separate savings product — the payment account itself earns.
+              Users see it as <strong style={{ color: 'var(--color-ink)' }}>Earnings</strong> in the app, not yield or APY.
+            </p>
+
+            {/* How it works strip */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 36 }}>
+              {([
+                { label: 'Always on', desc: 'Earnings start the moment funds arrive. No opt-in, no setup.' },
+                { label: 'Monthly payout', desc: 'The account balance grows once a month. Visible in the Earn tab.' },
+                { label: 'Vault choice', desc: 'Users can switch vault at any time. Default is set during onboarding.' },
+              ] as { label: string; desc: string }[]).map(({ label, desc }) => (
+                <div key={label} style={{
+                  background: 'var(--color-surface-card)',
+                  border: '1px solid var(--color-hairline)',
+                  borderRadius: 12,
+                  padding: '18px 20px',
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 6 }}>{label}</div>
+                  <div style={{ fontSize: 12, color: 'var(--color-muted)', lineHeight: 1.6 }}>{desc}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Vault options */}
+            <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-muted)', marginBottom: 14 }}>
+              Available vaults
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {([
+                { name: 'AAVE USD Coin',        apy: '4.2%', tag: 'Default', tagColor: 'var(--color-primary)', tagBg: 'rgba(235,252,14,0.12)' },
+                { name: 'AAVE USD Coin v3',     apy: '4.8%', tag: 'AAVE',    tagColor: 'var(--color-muted)',   tagBg: 'var(--color-surface-elevated)' },
+                { name: 'Morpho USDC',          apy: '5.1%', tag: 'Morpho',  tagColor: 'var(--color-muted)',   tagBg: 'var(--color-surface-elevated)' },
+                { name: 'Morpho USDC Prime',    apy: '5.7%', tag: 'Morpho',  tagColor: 'var(--color-muted)',   tagBg: 'var(--color-surface-elevated)' },
+                { name: 'Morpho USDC Boost',    apy: '6.2%', tag: 'Morpho',  tagColor: 'var(--color-muted)',   tagBg: 'var(--color-surface-elevated)' },
+              ] as { name: string; apy: string; tag: string; tagColor: string; tagBg: string }[]).map(({ name, apy, tag, tagColor, tagBg }, i, arr) => (
+                <div key={name} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '16px 20px',
+                  background: i === 0 ? 'rgba(235,252,14,0.04)' : 'var(--color-surface-soft)',
+                  border: '1px solid var(--color-hairline)',
+                  borderTop: i === 0 ? '1px solid var(--color-hairline)' : 'none',
+                  borderRadius: i === 0 ? '12px 12px 0 0' : i === arr.length - 1 ? '0 0 12px 12px' : 0,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, padding: '3px 8px',
+                      borderRadius: 99, background: tagBg, color: tagColor,
+                      textTransform: 'uppercase', letterSpacing: '0.06em',
+                    }}>{tag}</span>
+                    <span style={{ fontSize: 14, fontWeight: i === 0 ? 600 : 400, color: 'var(--color-ink)' }}>{name}</span>
+                  </div>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-yield)', fontVariantNumeric: 'tabular-nums' }}>{apy}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* ── FLOWS ── */}
 
           <section id="flow-map" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
@@ -1399,37 +1498,6 @@ export function UseCase() {
               Green is the success terminal. Red dashed branches show failures with retry paths.
             </Callout>
             <Legend />
-
-            {/* QR code — try it on your phone */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 36,
-              background: 'var(--color-glass-tint)',
-              border: '1px solid rgba(235,252,14,0.25)',
-              borderRadius: 16,
-              padding: '28px 36px',
-              marginBottom: 28,
-            }}>
-              <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 12, flexShrink: 0 }}>
-                <QRCodeSVG value="https://shieldvault.netlify.app" size={96} bgColor="#FFFFFF" fgColor="#0A0A09" level="M" />
-              </div>
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 6 }}>
-                  Try it on your phone
-                </div>
-                <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em', marginBottom: 6 }}>
-                  Scan to walk through the flow
-                </div>
-                <div style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.6, marginBottom: 8 }}>
-                  Live prototype. Full onboarding flow, VISA card selection, auto-yield. No install required.
-                </div>
-                <div style={{ fontSize: 12, fontFamily: 'monospace', color: 'var(--color-muted)' }}>
-                  shieldvault.netlify.app
-                </div>
-              </div>
-            </div>
-
             <FlowMap />
           </section>
 
