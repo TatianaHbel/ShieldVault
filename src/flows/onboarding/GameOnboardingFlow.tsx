@@ -82,7 +82,7 @@ function GmAssetImage({
 function GmTransmissionTower() {
   return (
     <GmAssetImage
-      src="/assets/pipboy/sen%CC%83al.png"
+      src="/assets/pipboy/signal.png"
       label="Pip-Boy receiving a signal transmission"
       className="gm-asset-image--signal gm-illustration--pulse"
     />
@@ -232,7 +232,7 @@ function GmS3Otp({ email, onNext }: { email: string; onNext: () => void }) {
 
       <div className="gm-body gm-otp-body">
         <GmAssetImage
-          src="/assets/pipboy/sen%CC%83al.png"
+          src="/assets/pipboy/signal.png"
           label="Pip-Boy receiving the verification signal"
           className="gm-asset-image--otp-signal"
         />
@@ -559,7 +559,7 @@ function GmS7Tos({ onNext }: { onNext: () => void }) {
 
       <div className="gm-body">
         <GmAssetImage
-          src="/assets/pipboy/banking%20.png"
+          src="/assets/pipboy/banking.png"
           label="Vault banking door"
           className="gm-asset-image--banking"
         />
@@ -743,7 +743,7 @@ function GmS8Processing({ onNext }: { onNext: () => void }) {
     <motion.div className="gm-screen gm-crt" {...FADE}>
       <div className="gm-proc-body">
         <div className="gm-walk-cycle">
-          <img className="gm-walk-sprite" src="/assets/pipboy/pipboy%20walking%20%201.png" alt="Pip-Boy walking while the deposit is verified" />
+          <img className="gm-walk-sprite" src="/assets/pipboy/pipboy-walking-1.png" alt="Pip-Boy walking while the deposit is verified" />
         </div>
 
         <div className="gm-proc-title">
