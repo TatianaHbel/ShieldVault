@@ -6,8 +6,16 @@ import { Button } from './components/Button'
 import { useOnboarding } from './hooks/useOnboarding'
 import { OnboardingFlow } from './flows/onboarding/OnboardingFlow'
 import { GameOnboardingFlow } from './flows/onboarding/GameOnboardingFlow'
+import svLogo from './img/SVlogo.svg'
 import './App.css'
 import './styles/game-mode.css'
+
+const VARIANT_ENTRY_KEY = 'shieldvault_variant_entry'
+const PIPBOY_SKIN_KEY = 'shieldvault_pipboy_skin_unlocked'
+const ACTIVE_THEME_KEY = 'shieldvault_active_theme'
+const CARD_SKIN_KEY = 'shieldvault_card_skin'
+
+type AppTheme = 'standard' | 'pipboy'
 
 function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMode: () => void }) {
   return (
@@ -19,11 +27,15 @@ function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMod
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <button className="gm-trigger" onClick={onGameMode} aria-label="">
-        {'◈'}
+      <button className="gm-trigger" onClick={onGameMode} aria-label="Activate hidden Pip-Boy mode">
+        <span className="gm-trigger__glyph" aria-hidden="true">
+          <span className="gm-trigger__dot" />
+          <span className="gm-trigger__ring gm-trigger__ring--one" />
+          <span className="gm-trigger__ring gm-trigger__ring--two" />
+        </span>
       </button>
       <div className="landing-hero">
-        <div className="landing-logo">ShieldVault</div>
+        <img src={svLogo} alt="ShieldVault" className="landing-logo" />
         <div className="landing-tagline">
           Private payments with automatic yield on every dollar
         </div>
@@ -71,14 +83,32 @@ function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMod
 export default function App() {
   const onboarding = useOnboarding()
   const [gameMode, setGameMode] = useState(false)
+  const [activeTheme, setActiveTheme] = useState<AppTheme>(() => {
+    return localStorage.getItem(ACTIVE_THEME_KEY) === 'pipboy' ? 'pipboy' : 'standard'
+  })
+
+  const setTheme = (theme: AppTheme) => {
+    localStorage.setItem(ACTIVE_THEME_KEY, theme)
+    setActiveTheme(theme)
+  }
 
   const handleGameComplete = () => {
+    localStorage.setItem(VARIANT_ENTRY_KEY, 'pipboy')
+    localStorage.setItem(PIPBOY_SKIN_KEY, '1')
+    localStorage.setItem(CARD_SKIN_KEY, 'pipboy')
+    localStorage.setItem(ACTIVE_THEME_KEY, 'pipboy')
+    setActiveTheme('pipboy')
     setGameMode(false)
     onboarding.advance('completed')
   }
 
   const handleReset = () => {
     setGameMode(false)
+    localStorage.removeItem(VARIANT_ENTRY_KEY)
+    localStorage.removeItem(PIPBOY_SKIN_KEY)
+    localStorage.removeItem(ACTIVE_THEME_KEY)
+    localStorage.removeItem(CARD_SKIN_KEY)
+    setActiveTheme('standard')
     onboarding.reset()
   }
 
@@ -86,7 +116,12 @@ export default function App() {
     <MobileShell>
       <div className="app-layer">
         {onboarding.isComplete ? (
-          <HomeScreen key="home" onReset={handleReset} />
+          <HomeScreen
+            key="home"
+            theme={activeTheme}
+            onThemeChange={setTheme}
+            onReset={handleReset}
+          />
         ) : gameMode ? (
           <GameOnboardingFlow key="game" onComplete={handleGameComplete} />
         ) : onboarding.isActive ? (

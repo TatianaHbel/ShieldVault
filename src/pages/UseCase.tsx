@@ -824,7 +824,7 @@ function ColorSection() {
       <SwatchGroup label="Brand">
         <ColorRow swatches={[
           { token: '--color-primary',          hex: '#EBFC0E', note: 'Electric Lime' },
-          { token: '--color-primary-active',   hex: '#D4B530', note: 'Pressed state' },
+          { token: '--color-primary-active',   hex: '#D4E40C', note: 'Pressed state' },
           { token: '--color-primary-disabled', hex: '#3A3220', note: 'Disabled fill' },
           { token: '--color-on-primary',       hex: '#0A0A09', note: 'Text on gold' },
         ]} />
@@ -1466,9 +1466,64 @@ export function UseCase() {
             <FlowMap />
           </section>
 
-          <section id="screens" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+          {/* ── PROBLEMS SOLVED ── */}
+
+          <section id="problems" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>02</span>
+              <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Problems we were asked to solve</h2>
+            </div>
+            <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 36px', lineHeight: 1.7 }}>
+              ShieldVault is the retail pivot of ShieldPay. The brief defined four problems to solve
+              by converting a DeFi product into something a mainstream user would actually choose.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {[
+                {
+                  problem: 'Blockchain is too complex for mainstream users',
+                  solution: 'Every blockchain action — shielding, yield routing, signing — happens automatically. Users connect with email or Google. No wallet, no gas, no confirmation steps ever.',
+                  tag: 'UX',
+                },
+                {
+                  problem: 'DeFi yield is inaccessible without crypto literacy',
+                  solution: 'Auto-yield is on by default from the moment funds arrive. No separate savings account, no protocol interaction. The payment account itself earns — up to 6.2% APY across 5 vault options.',
+                  tag: 'Product',
+                },
+                {
+                  problem: 'Neobanks have no amount confidentiality',
+                  solution: 'Amounts stay private by default. The infrastructure ensures confidentiality without the user doing anything differently. Privacy is the default, not a feature to enable.',
+                  tag: 'Infrastructure',
+                },
+                {
+                  problem: 'Crypto-backed accounts cannot pay in the real world',
+                  solution: 'A VISA card (PREMIER free, PREMIUM at $2/mo) connects directly to the account. Apple Pay supported. Users spend in USD or EUR from their balance, anywhere in the world.',
+                  tag: 'Payments',
+                },
+              ].map(({ problem, solution, tag }, i, arr) => (
+                <div key={i} style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  borderRadius: i === 0 ? '14px 14px 0 0' : i === arr.length - 1 ? '0 0 14px 14px' : 0,
+                  border: '1px solid var(--color-hairline)',
+                  borderTop: i === 0 ? '1px solid var(--color-hairline)' : 'none',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{ padding: '22px 24px', background: 'rgba(239,68,68,0.04)', borderRight: '1px solid var(--color-hairline)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-error)', marginBottom: 10, opacity: 0.7 }}>Problem</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.5 }}>{problem}</div>
+                  </div>
+                  <div style={{ padding: '22px 24px', background: 'var(--color-surface-soft)' }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 10, opacity: 0.8 }}>{tag}</div>
+                    <div style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.65 }}>{solution}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section id="screens" data-section="" style={{ marginBottom: 96, scrollMarginTop: 80 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>03</span>
               <h2 style={{ margin: 0, fontSize: 26, fontWeight: 700, color: 'var(--color-ink)', letterSpacing: '-0.02em' }}>Screen gallery</h2>
             </div>
             <p style={{ fontSize: 15, color: 'var(--color-body)', margin: '0 0 32px', lineHeight: 1.7 }}>
@@ -1601,6 +1656,28 @@ export function UseCase() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Design decision: Yield vs Earn */}
+            <div style={{
+              marginTop: 28,
+              background: 'var(--color-surface-card)',
+              border: '1px solid var(--color-hairline-strong)',
+              borderLeft: '3px solid var(--color-primary)',
+              borderRadius: '0 10px 10px 0',
+              padding: '20px 24px',
+            }}>
+              <div style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-primary)', marginBottom: 10 }}>
+                Design decision
+              </div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--color-ink)', marginBottom: 8, lineHeight: 1.4 }}>
+                {"\"Yield\" is DeFi vocabulary — it lives in the anti-reference pile alongside \"gas\" and \"wallet\""}
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--color-body)', lineHeight: 1.7 }}>
+                {"\"Yield\" stays in code internals and provider technical names (AAVE is still called AAVE). User-facing copy uses "}
+                <strong style={{ color: 'var(--color-ink)' }}>earn / earnings / earning X%</strong>
+                {" instead. The word \"yield\" never appears in the UI."}
+              </div>
             </div>
           </section>
 
