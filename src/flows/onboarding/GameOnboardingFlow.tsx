@@ -1,43 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-
-// ── Vault door SVG ──────────────────────────────────────────────
-
-function VaultDoor({ size = 88, color = '#E8C93A', spin = true }: { size?: number; color?: string; spin?: boolean }) {
-  const c   = size / 2
-  const r1  = size * 0.44
-  const r2  = size * 0.27
-  const N   = 8
-  const T   = 24
-
-  const spokes = Array.from({ length: N }, (_, i) => {
-    const a = (i * Math.PI * 2) / N
-    return { x1: c + Math.cos(a) * r2, y1: c + Math.sin(a) * r2, x2: c + Math.cos(a) * r1, y2: c + Math.sin(a) * r1 }
-  })
-  const ticks = Array.from({ length: T }, (_, i) => {
-    const a   = (i * Math.PI * 2) / T
-    const maj = i % 3 === 0
-    const ri  = r1 - (maj ? 6 : 3)
-    return { x1: c + Math.cos(a) * r1, y1: c + Math.sin(a) * r1, x2: c + Math.cos(a) * ri, y2: c + Math.sin(a) * ri, maj }
-  })
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <g style={{ transformOrigin: `${c}px ${c}px`, animation: spin ? 'gm-vault-spin 28s linear infinite' : 'none' }}>
-        <circle cx={c} cy={c} r={r1} fill="none" stroke={color} strokeWidth={1.5} />
-        {ticks.map((t, i) => (
-          <line key={i} x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} stroke={color} strokeWidth={t.maj ? 1.4 : 0.7} opacity={t.maj ? 0.85 : 0.35} />
-        ))}
-        {spokes.map((s, i) => (
-          <line key={i} x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2} stroke={color} strokeWidth={1.5} />
-        ))}
-      </g>
-      <circle cx={c} cy={c} r={r2} fill="none" stroke={color} strokeWidth={1.5} />
-      <circle cx={c} cy={c} r={size * 0.065} fill={color} opacity={0.7} />
-      <circle cx={c} cy={c} r={size * 0.03} fill={color} />
-    </svg>
-  )
-}
+import { PipboyMissionCard } from '../../components/PipboyMissionCard'
 
 // ── Typewriter ──────────────────────────────────────────────────
 
@@ -84,6 +47,48 @@ function GmHeader({ step, title, sub }: { step: number; title: string; sub?: str
   )
 }
 
+function GmIllustration({
+  name,
+  label,
+  className = '',
+}: {
+  name: string
+  label: string
+  className?: string
+}) {
+  return (
+    <div className={`gm-illustration ${className}`.trim()}>
+      <img src={`/assets/pipboy/illustrations/${name}.svg`} alt={label} />
+    </div>
+  )
+}
+
+function GmAssetImage({
+  src,
+  label,
+  className = '',
+}: {
+  src: string
+  label: string
+  className?: string
+}) {
+  return (
+    <div className={`gm-asset-image ${className}`.trim()}>
+      <img src={src} alt={label} />
+    </div>
+  )
+}
+
+function GmTransmissionTower() {
+  return (
+    <GmAssetImage
+      src="/assets/pipboy/sen%CC%83al.png"
+      label="Pip-Boy receiving a signal transmission"
+      className="gm-asset-image--signal gm-illustration--pulse"
+    />
+  )
+}
+
 // ── SLIDE variants ──────────────────────────────────────────────
 
 const SLIDE_IN  = { initial: { opacity: 0, x: 30 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -30 }, transition: { duration: 0.32, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } }
@@ -94,8 +99,7 @@ const FADE      = { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { op
 // ═══════════════════════════════════════════════════════════════
 
 function GmS1Signal({ onNext }: { onNext: () => void }) {
-  const { displayed: h, done: hDone } = useTypewriter('TRANSMISSION RECEIVED', 55, 250)
-  const { displayed: s, done: sDone } = useTypewriter('INCOMING SIGNAL FROM VAULT-SHIELD CENTRAL COMMAND. NEW CITIZEN REGISTRATION PROTOCOL INITIATED.', 20, 1500)
+  const { displayed: s, done: sDone } = useTypewriter('Hidden Pip-Boy registration signal found. Start the alternate account setup to unlock the field-issue card skin.', 20, 450)
   const [showBtn, setShowBtn] = useState(false)
 
   useEffect(() => {
@@ -106,30 +110,16 @@ function GmS1Signal({ onNext }: { onNext: () => void }) {
 
   return (
     <motion.div className="gm-screen gm-crt" {...FADE}>
-      <div className="gm-s1-top">
+      <div className="gm-s1-top gm-s1-top--header">
         <div className="gm-s1-brand">VAULT-SHIELD CITIZENS BUREAU</div>
+        <div className="gm-s1-headline gm-glitch">TRANSMISSION RECEIVED</div>
       </div>
 
       <div className="gm-s1-body">
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1, type: 'spring', damping: 12, stiffness: 160 }}
-        >
-          <VaultDoor size={92} />
-        </motion.div>
-
-        <div className="gm-s1-headline gm-glitch">
-          {h}{!hDone && <span className="gm-cursor" />}
-        </div>
+        <GmTransmissionTower />
         <div className="gm-s1-sub">
-          {s}{hDone && !sDone && <span className="gm-cursor" />}
+          {s}{!sDone && <span className="gm-cursor" />}
         </div>
-        {sDone && (
-          <motion.div className="gm-s1-status" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
-            AWAITING RESPONSE...
-          </motion.div>
-        )}
       </div>
 
       <div className="gm-footer">
@@ -155,10 +145,16 @@ function GmS2Email({ onNext }: { onNext: (email: string) => void }) {
 
   return (
     <motion.div className="gm-screen gm-crt" {...SLIDE_IN}>
-      <GmHeader step={1} title="COMM CHANNEL REGISTRATION" sub="ENTER YOUR COMM CHANNEL ID TO ESTABLISH A SECURE LINK" />
+      <GmHeader step={1} title="COMM CHANNEL" sub="ENTER AN EMAIL TO VERIFY YOUR ACCOUNT" />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
+        <GmAssetImage
+          src="/assets/pipboy/email.png"
+          label="Pip-Boy holding an email envelope"
+          className="gm-asset-image--email"
+        />
+
         <div className="gm-field">
           <div className="gm-field-label">COMM CHANNEL ID</div>
           <div className={`gm-field-row${focused ? ' gm-field-row--focused' : ''}`}>
@@ -234,7 +230,12 @@ function GmS3Otp({ email, onNext }: { email: string; onNext: () => void }) {
       <GmHeader step={1} title="SIGNAL LOCK VERIFICATION" sub={`6-DIGIT CODE TRANSMITTED TO ${display}`} />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
-      <div className="gm-body" style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <div className="gm-body gm-otp-body">
+        <GmAssetImage
+          src="/assets/pipboy/sen%CC%83al.png"
+          label="Pip-Boy receiving the verification signal"
+          className="gm-asset-image--otp-signal"
+        />
         <div className="gm-otp-wrap">
           <input ref={inputRef} type="tel" inputMode="numeric" maxLength={6} value={otp}
             onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -283,6 +284,12 @@ function GmS4Identity({ onNext }: { onNext: (p: { firstName: string; lastName: s
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
+        <GmAssetImage
+          src="/assets/pipboy/stamp.png"
+          label="Pip-Boy stamping a citizen file"
+          className="gm-asset-image--stamp"
+        />
+
         <div className="gm-field">
           <div className="gm-field-label">AGENT DESIGNATION</div>
           <div className={`gm-field-row${focus === 'first' ? ' gm-field-row--focused' : ''}`}>
@@ -359,6 +366,12 @@ function GmS5Address({ onNext }: { onNext: (p: { street: string; city: string; p
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
+        <GmAssetImage
+          src="/assets/pipboy/map.png"
+          label="Pip-Boy reading settlement coordinates"
+          className="gm-asset-image--map"
+        />
+
         <div className="gm-field">
           <div className="gm-field-label">STREET ADDRESS</div>
           <div className={`gm-field-row${focus === 'street' ? ' gm-field-row--focused' : ''}`}>
@@ -377,15 +390,15 @@ function GmS5Address({ onNext }: { onNext: (p: { street: string; city: string; p
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div className="gm-field" style={{ flex: 1 }}>
+        <div className="gm-address-row">
+          <div className="gm-field">
             <div className="gm-field-label">POSTAL CODE</div>
             <div className={`gm-field-row${focus === 'postal' ? ' gm-field-row--focused' : ''}`}>
               <span className="gm-field-prompt">{'>'}</span>
               <input className="gm-field-input" type="text" inputMode="numeric" placeholder="00000" value={form.postal} autoComplete="postal-code" onChange={set('postal')} {...field('postal')} />
             </div>
           </div>
-          <div className="gm-field" style={{ flex: 1 }}>
+          <div className="gm-field">
             <div className="gm-field-label">TERRITORY</div>
             <div className={`gm-field-row${focus === 'country' ? ' gm-field-row--focused' : ''}`}>
               <select className="gm-field-select" value={form.country} onChange={set('country')} {...field('country')}>
@@ -410,68 +423,124 @@ function GmS5Address({ onNext }: { onNext: (p: { street: string; city: string; p
 // Screen 6 — BIOMETRIC CLEARANCE (auto-scan)
 // ═══════════════════════════════════════════════════════════════
 
-const SCANS = ['FACIAL RECOGNITION', 'RETINAL SCAN', 'FINGERPRINT ANALYSIS'] as const
-
 function GmS6Biometric({ onNext }: { onNext: () => void }) {
-  const [progress, setProgress] = useState([0, 0, 0])
+  const [progress, setProgress] = useState(0)
+  const [scanning, setScanning] = useState(false)
   const [cleared, setCleared]   = useState(false)
+  const [cameraError, setCameraError] = useState('')
+  const [cameraStarting, setCameraStarting] = useState(false)
+  const [cameraActive, setCameraActive] = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    const timers: ReturnType<typeof setTimeout>[] = []
-    SCANS.forEach((_, idx) => {
-      const startDelay = idx * 1600 + 400
-      timers.push(setTimeout(() => {
-        let v = 0
-        const iv = setInterval(() => {
-          v += 3
-          setProgress(p => { const n = [...p]; n[idx] = Math.min(v, 100); return n })
-          if (v >= 100) clearInterval(iv)
-        }, 22)
-      }, startDelay))
-    })
-    timers.push(setTimeout(() => setCleared(true), 5600))
-    timers.push(setTimeout(onNext, 6800))
-    return () => timers.forEach(clearTimeout)
-  }, [onNext])
+  const stopCamera = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
+    streamRef.current?.getTracks().forEach((track) => track.stop())
+    streamRef.current = null
+    if (videoRef.current) videoRef.current.srcObject = null
+    setCameraActive(false)
+  }, [])
+
+  useEffect(() => stopCamera, [stopCamera])
+
+  const startScan = async () => {
+    if (scanning || cameraStarting || cleared) return
+    setCameraError('')
+    setCameraStarting(true)
+    setProgress(0)
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraStarting(false)
+      setCameraError(window.isSecureContext
+        ? 'CAMERA ACCESS IS NOT AVAILABLE IN THIS BROWSER'
+        : 'OPEN THIS DEMO ON LOCALHOST OR HTTPS TO USE CAMERA')
+      return
+    }
+
+    let stream: MediaStream
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'user' } },
+        audio: false,
+      })
+    } catch {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      } catch {
+        stopCamera()
+        setCameraStarting(false)
+        setCameraError('CAMERA PERMISSION REQUIRED TO COMPLETE FACE SCAN')
+        return
+      }
+    }
+
+    try {
+      streamRef.current = stream
+      setCameraActive(true)
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        videoRef.current.play().catch(() => undefined)
+      }
+    } catch {
+      stopCamera()
+      setCameraStarting(false)
+      setCameraError('CAMERA STREAM COULD NOT START')
+      return
+    }
+
+    setCameraStarting(false)
+    setScanning(true)
+    let v = 0
+    timerRef.current = setInterval(() => {
+      v += 4
+      setProgress(Math.min(v, 100))
+      if (v >= 100) {
+        if (timerRef.current) clearInterval(timerRef.current)
+        timerRef.current = null
+        setCleared(true)
+        setScanning(false)
+        stopCamera()
+      }
+    }, 80)
+  }
 
   return (
     <motion.div className="gm-screen gm-crt" {...SLIDE_IN}>
-      <GmHeader step={4} title="BIOMETRIC CLEARANCE" sub="VAULT-SHIELD SCANNING YOUR BIOMETRIC PROFILE" />
+      <GmHeader step={4} title="BIOMETRIC CLEARANCE" sub="SCAN YOUR FACE TO CONFIRM YOUR IDENTITY" />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-bio-body">
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', damping: 12, stiffness: 160 }}>
-          <VaultDoor size={72} color={cleared ? '#22C55E' : '#E8C93A'} spin={!cleared} />
-        </motion.div>
-
-        <div className="gm-scan-rows" style={{ width: '100%', maxWidth: 280 }}>
-          {SCANS.map((label, idx) => {
-            const pct  = progress[idx]
-            const done = pct >= 100
-            return (
-              <div key={label} className="gm-scan-row">
-                <div className="gm-scan-row-header">
-                  <span className="gm-scan-row-label">{label}</span>
-                  <span className={`gm-scan-row-status${done ? ' gm-scan-row-status--done' : ' gm-scan-row-status--scanning'}`}>
-                    {done ? 'COMPLETE' : pct > 0 ? `${pct}%` : 'STANDBY'}
-                  </span>
-                </div>
-                <div className="gm-scan-bar-track">
-                  <div className={`gm-scan-bar-fill${done ? ' gm-scan-bar-fill--green' : ''}`} style={{ width: `${pct}%` }} />
-                </div>
+        <div className={`gm-camera${cameraActive ? ' gm-camera--active' : ''}${scanning ? ' gm-camera--scanning' : ''}${cleared ? ' gm-camera--cleared' : ''}`}>
+          <div className="gm-camera__frame">
+            <video ref={videoRef} className="gm-camera__video" autoPlay muted playsInline />
+            {!cameraActive && !scanning && !cleared && (
+              <div className="gm-camera__face" aria-hidden="true">
+                <div className="gm-camera__eyes" />
+                <div className="gm-camera__mouth" />
               </div>
-            )
-          })}
+            )}
+            {cleared && <div className="gm-camera__cleared">MATCH</div>}
+            <div className="gm-camera__scanline" />
+          </div>
+          <div className="gm-camera__status">
+            {cameraError || (cleared ? 'FACE MATCH CONFIRMED' : cameraStarting ? 'REQUESTING CAMERA PERMISSION' : scanning ? 'SCANNING LIVE CAMERA' : 'CAMERA READY')}
+          </div>
+          {(scanning || cleared) && (
+            <div className="gm-scan-bar-track">
+              <div className={`gm-scan-bar-fill${cleared ? ' gm-scan-bar-fill--green' : ''}`} style={{ width: `${progress}%` }} />
+            </div>
+          )}
         </div>
 
-        <AnimatePresence>
-          {cleared && (
-            <motion.div className="gm-bio-clearance" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-              <div className="gm-bio-badge">VAULT-SHIELD CLEARANCE GRANTED</div>
-              <div className="gm-bio-sub">BIOMETRIC PROFILE REGISTERED</div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <button className="gm-btn" onClick={cleared ? onNext : startScan} disabled={scanning || cameraStarting}>
+          {cleared ? '[ CONFIRM IDENTITY ]' : cameraStarting ? '[ OPENING CAMERA ]' : scanning ? '[ SCANNING ]' : '[ SCAN FACE ]'}
+        </button>
       </div>
       <div className="gm-coords">VS-NET // STEP 04 // BIOMETRIC CLEARANCE</div>
     </motion.div>
@@ -485,33 +554,18 @@ function GmS6Biometric({ onNext }: { onNext: () => void }) {
 function GmS7Tos({ onNext }: { onNext: () => void }) {
   return (
     <motion.div className="gm-screen gm-crt" {...SLIDE_IN}>
-      <GmHeader step={5} title="OVERSEER AGREEMENT" />
+      <GmHeader step={5} title="ACCOUNT ACTIVATION" sub="ACCEPT TERMS TO ACTIVATE YOUR ACCOUNT" />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
-        <div style={{ textAlign: 'center', padding: '8px 0' }}>
-          <VaultDoor size={52} />
-        </div>
+        <GmAssetImage
+          src="/assets/pipboy/banking%20.png"
+          label="Vault banking door"
+          className="gm-asset-image--banking"
+        />
 
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontFamily: "'Courier New', monospace", fontSize: 11, letterSpacing: 2, color: 'var(--color-muted)', lineHeight: 1.8, maxWidth: 280, margin: '0 auto' }}>
-            THE OVERSEER HAS REVIEWED YOUR APPLICATION. YOUR VAULT-SHIELD BALANCE IS PROTECTED UNDER FULL ENCRYPTION. AUTO-YIELD OPERATES IN THE BACKGROUND.
-          </div>
-        </div>
-
-        <div className="gm-tos-links">
-          <button className="gm-tos-link-row">
-            <span>CITIZEN AGREEMENT</span>
-            <span className="gm-tos-arrow">{'>'}</span>
-          </button>
-          <button className="gm-tos-link-row">
-            <span>PRIVACY PROTOCOLS</span>
-            <span className="gm-tos-arrow">{'>'}</span>
-          </button>
-        </div>
-
-        <div className="gm-tos-footnote">
-          BY ACCEPTING YOU AGREE TO THE VAULT-SHIELD CITIZEN AGREEMENT AND PRIVACY PROTOCOLS.
+        <div className="gm-activation-copy">
+          Accept the citizen agreement to activate your ShieldVault account.
         </div>
       </div>
 
@@ -530,44 +584,31 @@ function GmS7Tos({ onNext }: { onNext: () => void }) {
 // ═══════════════════════════════════════════════════════════════
 
 function GmS8Funding({ onCrypto, onFiat }: { onCrypto: () => void; onFiat: () => void }) {
-  const [selected, setSelected] = useState<'crypto' | 'fiat' | null>(null)
-
-  const confirm = () => {
-    if (selected === 'crypto') onCrypto()
-    else if (selected === 'fiat') onFiat()
-  }
-
   return (
     <motion.div className="gm-screen gm-crt" {...SLIDE_IN}>
       <GmHeader step={6} title="VAULT CREDIT ALLOCATION" sub="MINIMUM ALLOCATION: $50.00 USD" />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
-        <div className="gm-box">
-          <div className="gm-box-title">AUTO-YIELD PROTOCOL</div>
-          <div className="gm-box-row"><span>YIELD RATE</span><span className="green">4.2% APY</span></div>
-          <div className="gm-box-row"><span>PROVIDER</span><span>AAVE PROTOCOL</span></div>
-          <div className="gm-box-row"><span>LOCK PERIOD</span><span>NONE</span></div>
-          <div className="gm-box-row"><span>ACTIVATION</span><span>INSTANT</span></div>
-        </div>
+        <GmAssetImage
+          src="/assets/pipboy/crypto.png"
+          label="Crypto vault allocation"
+          className="gm-asset-image--funding-crypto"
+        />
 
         <div className="gm-choice">
-          <button className={`gm-choice-card${selected === 'crypto' ? ' gm-choice-card--active' : ''}`} onClick={() => setSelected('crypto')}>
-            <div className={`gm-choice-indicator${selected === 'crypto' ? ' gm-choice-indicator--filled' : ''}`}>
-              {selected === 'crypto' ? '■' : ''}
-            </div>
+          <button className="gm-choice-card" onClick={onCrypto}>
+            <div className="gm-choice-indicator">{'>'}</div>
             <div className="gm-choice-body">
-              <div className="gm-choice-title">CRYPTO TRANSFER</div>
+              <div className="gm-choice-title">FUND WITH CRYPTO</div>
               <div className="gm-choice-sub">USDC, ETH, BTC ACCEPTED</div>
             </div>
             <div className="gm-choice-badge">FAST</div>
           </button>
-          <button className={`gm-choice-card${selected === 'fiat' ? ' gm-choice-card--active' : ''}`} onClick={() => setSelected('fiat')}>
-            <div className={`gm-choice-indicator${selected === 'fiat' ? ' gm-choice-indicator--filled' : ''}`}>
-              {selected === 'fiat' ? '■' : ''}
-            </div>
+          <button className="gm-choice-card" onClick={onFiat}>
+            <div className="gm-choice-indicator">{'>'}</div>
             <div className="gm-choice-body">
-              <div className="gm-choice-title">FIAT ONRAMP</div>
+              <div className="gm-choice-title">FUND WITH BANKING</div>
               <div className="gm-choice-sub">BANK TRANSFER OR CREDIT CARD</div>
             </div>
             <div className="gm-choice-badge">EASY</div>
@@ -575,11 +616,6 @@ function GmS8Funding({ onCrypto, onFiat }: { onCrypto: () => void; onFiat: () =>
         </div>
       </div>
 
-      <div className="gm-footer">
-        <button className="gm-btn" disabled={!selected} onClick={confirm}>
-          {'[ PROCEED TO ALLOCATION ]'}
-        </button>
-      </div>
       <div className="gm-coords">VS-NET // STEP 06 // VAULT CREDIT</div>
     </motion.div>
   )
@@ -605,6 +641,15 @@ function GmS8Crypto({ onNext }: { onNext: () => void }) {
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
+        <div className="gm-qr-wrap" aria-label="Deposit QR code">
+          <div className="gm-qr">
+            {Array.from({ length: 49 }, (_, i) => (
+              <span key={i} className={(i * 7 + i % 5) % 3 === 0 || [0,1,2,7,14,34,41,42,43,44,45,46,48].includes(i) ? 'gm-qr__cell gm-qr__cell--on' : 'gm-qr__cell'} />
+            ))}
+          </div>
+          <div className="gm-qr-label">SCAN TO DEPOSIT</div>
+        </div>
+
         <div className="gm-addr-box">
           <div className="gm-addr-label">VAULT-SHIELD DEPOSIT ADDRESS</div>
           <div className="gm-addr-value">{short}</div>
@@ -642,7 +687,9 @@ function GmS8Fiat({ onNext }: { onNext: () => void }) {
       <GmHeader step={6} title="FIAT ONRAMP PROTOCOL" sub="SELECT YOUR ALLOCATION METHOD" />
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
-      <div className="gm-body">
+      <div className="gm-body gm-body--compact">
+        <GmIllustration name="funding-terminal" label="Banking allocation terminal" className="gm-illustration--compact" />
+
         <div className="gm-choice">
           <button className={`gm-choice-card${method === 'bank' ? ' gm-choice-card--active' : ''}`} onClick={() => setMethod('bank')}>
             <div className={`gm-choice-indicator${method === 'bank' ? ' gm-choice-indicator--filled' : ''}`}>
@@ -695,15 +742,17 @@ function GmS8Processing({ onNext }: { onNext: () => void }) {
   return (
     <motion.div className="gm-screen gm-crt" {...FADE}>
       <div className="gm-proc-body">
-        <VaultDoor size={72} color={done ? '#22C55E' : '#E8C93A'} spin={!done} />
+        <div className="gm-walk-cycle">
+          <img className="gm-walk-sprite" src="/assets/pipboy/pipboy%20walking%20%201.png" alt="Pip-Boy walking while the deposit is verified" />
+        </div>
 
         <div className="gm-proc-title">
-          {done ? 'ALLOCATION CONFIRMED' : 'VERIFYING VAULT CREDIT ALLOCATION'}
+          {done ? 'ALLOCATION CONFIRMED' : 'VERIFYING DEPOSIT'}
         </div>
         <div className="gm-proc-sub">
           {done
-            ? 'YOUR VAULT-SHIELD BALANCE: $50.00'
-            : 'CONTACTING VAULT-SHIELD CLEARING SYSTEM'}
+            ? 'Your balance is ready.'
+            : 'This takes a few seconds in the demo.'}
         </div>
 
         <div className="gm-proc-bar-wrap">
@@ -748,6 +797,15 @@ function GmS9Card({ onNext }: { onNext: (tier: 'premier' | 'premium') => void })
       <hr className="gm-sep" style={{ marginTop: 14 }} />
 
       <div className="gm-body">
+        <div className="gm-card-preview">
+          <PipboyMissionCard
+            className={tier === 'premium' ? 'pip-card--premium' : ''}
+            mission={tier === 'premium' ? 'PREMIUM ROUTE' : 'FIRST DEPOSIT'}
+            series={tier === 'premium' ? 'OVERSEER PRIORITY ISSUE' : 'VAULT BUDDY FIELD ISSUE'}
+            showMascot={false}
+          />
+        </div>
+
         <div className="gm-choice">
           <button className={`gm-choice-card${tier === 'premier' ? ' gm-choice-card--active' : ''}`} onClick={() => setTier('premier')}>
             <div className={`gm-choice-indicator${tier === 'premier' ? ' gm-choice-indicator--filled' : ''}`}>
@@ -795,27 +853,7 @@ function GmS9Card({ onNext }: { onNext: (tier: 'premier' | 'premium') => void })
 // Screen 10 — ACCESS AUTHORIZED
 // ═══════════════════════════════════════════════════════════════
 
-function GmS10Granted({ firstName, lastName, onEnter }: { firstName: string; lastName: string; onEnter: () => void }) {
-  const [xp, setXp]             = useState(0)
-  const [showRows, setShowRows] = useState(false)
-  const [showBtn, setShowBtn]   = useState(false)
-  const [agentId]               = useState(() => String(Math.floor(Math.random() * 9000) + 1000))
-
-  useEffect(() => {
-    const t1 = setTimeout(() => {
-      let v = 0
-      const iv = setInterval(() => {
-        v += 2.5
-        setXp(Math.min(Math.round(v), 100))
-        if (v >= 100) clearInterval(iv)
-      }, 20)
-      return () => clearInterval(iv)
-    }, 500)
-    const t2 = setTimeout(() => setShowRows(true), 1600)
-    const t3 = setTimeout(() => setShowBtn(true), 2300)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
-  }, [])
-
+function GmS10Granted({ firstName, lastName, onNext }: { firstName: string; lastName: string; onNext: () => void }) {
   return (
     <motion.div className="gm-screen gm-crt" {...FADE}>
       <div className="gm-s10-body">
@@ -823,47 +861,49 @@ function GmS10Granted({ firstName, lastName, onEnter }: { firstName: string; las
           ACCESS AUTHORIZED
         </motion.div>
 
-        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring', damping: 10, stiffness: 160 }}>
-          <VaultDoor size={80} color="#22C55E" />
+        <motion.div initial={{ opacity: 0, y: 8, scale: 0.94 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ delay: 0.25 }}>
+          <GmIllustration name="access-authorized" label="Access authorized approval seal" className="gm-illustration--granted" />
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }} style={{ textAlign: 'center' }}>
           <div className="gm-granted-name">CITIZEN {firstName.toUpperCase()}</div>
           {lastName && <div className="gm-granted-sub">{lastName.toUpperCase()}</div>}
         </motion.div>
-
-        <motion.div className="gm-xp-wrap" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-          <div className="gm-xp-label">
-            <span>NETWORK SYNC</span>
-            <span>{xp}%</span>
-          </div>
-          <div className="gm-xp-track">
-            <div className="gm-xp-fill" style={{ width: `${xp}%` }} />
-          </div>
-        </motion.div>
-
-        <AnimatePresence>
-          {showRows && (
-            <motion.div className="gm-net-rows" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
-              <div className="gm-net-row"><span>VAULT STATUS</span><span>ONLINE</span></div>
-              <div className="gm-net-row"><span>YIELD PROTOCOL</span><span>4.2% APY</span></div>
-              <div className="gm-net-row"><span>SHIELD LAYER</span><span>ACTIVE</span></div>
-              <div className="gm-net-row"><span>CITIZEN ID</span><span>VS-{agentId}</span></div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="gm-footer">
-        <AnimatePresence>
-          {showBtn && (
-            <motion.button className="gm-btn gm-btn--green" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} onClick={onEnter}>
-              {'[ ENTER VAULT-SHIELD ]'}
-            </motion.button>
-          )}
-        </AnimatePresence>
+        <motion.button className="gm-btn gm-btn--green" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} onClick={onNext}>
+          {'[ CONTINUE ]'}
+        </motion.button>
       </div>
-      <div className="gm-coords">VS-NET // CITIZEN VS-{agentId} // CLEARANCE LEVEL 1</div>
+      <div className="gm-coords">VS-NET // CLEARANCE LEVEL 1</div>
+    </motion.div>
+  )
+}
+
+function GmS11SkinUnlocked({ onEnter }: { onEnter: () => void }) {
+  return (
+    <motion.div className="gm-screen gm-crt" {...FADE}>
+      <div className="gm-s10-body">
+        <motion.div className="gm-granted-badge" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+          FIELD ISSUE UNLOCKED
+        </motion.div>
+
+        <motion.div className="gm-unlock-card gm-unlock-card--hero" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
+          <PipboyMissionCard />
+        </motion.div>
+
+        <motion.div className="gm-skin-copy" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+          Card skin unlocked
+        </motion.div>
+      </div>
+
+      <div className="gm-footer">
+        <motion.button className="gm-btn gm-btn--green" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} onClick={onEnter}>
+          {'[ ENTER VAULT-SHIELD ]'}
+        </motion.button>
+      </div>
+      <div className="gm-coords">VS-NET // FIELD ISSUE CARD ACTIVE</div>
     </motion.div>
   )
 }
@@ -875,7 +915,7 @@ function GmS10Granted({ firstName, lastName, onEnter }: { firstName: string; las
 type GmStep =
   | 'signal' | 'email' | 'otp' | 'identity' | 'address'
   | 'biometric' | 'tos' | 'funding' | 'funding_crypto'
-  | 'funding_fiat' | 'processing' | 'card' | 'granted'
+  | 'funding_fiat' | 'processing' | 'card' | 'granted' | 'skin_unlocked'
 
 interface GmData {
   email: string
@@ -943,7 +983,10 @@ export function GameOnboardingFlow({ onComplete }: { onComplete: () => void }) {
           <GmS9Card key="card" onNext={tier => { patch({ cardTier: tier }); setStep('granted') }} />
         )}
         {step === 'granted' && (
-          <GmS10Granted key="granted" firstName={data.firstName} lastName={data.lastName} onEnter={onComplete} />
+          <GmS10Granted key="granted" firstName={data.firstName} lastName={data.lastName} onNext={() => setStep('skin_unlocked')} />
+        )}
+        {step === 'skin_unlocked' && (
+          <GmS11SkinUnlocked key="skin_unlocked" onEnter={onComplete} />
         )}
       </AnimatePresence>
     </div>

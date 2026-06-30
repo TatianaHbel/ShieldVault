@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Send, Download,
   Settings, Home, TrendingUp, CreditCard, User,
-  Check, ChevronRight,
+  Check, ChevronRight, RotateCcw,
 } from 'lucide-react'
 import { Button } from './Button'
+import { PipboyMissionCard } from './PipboyMissionCard'
 
 const YIELD_KEY = 'shieldvault_yield_provider'
+type HomeTheme = 'standard' | 'pipboy'
 
 const PROVIDERS = [
   { id: 'aave-usdc',         name: 'AAVE USD Coin',     apy: 4.2, tag: 'AAVE'   },
@@ -92,7 +94,15 @@ function YieldSetupSheet({
   )
 }
 
-export function HomeScreen({ onReset }: { onReset?: () => void }) {
+export function HomeScreen({
+  theme = 'standard',
+  onThemeChange,
+  onReset,
+}: {
+  theme?: HomeTheme
+  onThemeChange?: (theme: HomeTheme) => void
+  onReset?: () => void
+}) {
   const [activeTab, setActiveTab] = useState<'home' | 'earn' | 'cards' | 'account'>('home')
   const [yieldProvider, setYieldProvider] = useState<string | null>(
     () => localStorage.getItem(YIELD_KEY)
@@ -109,7 +119,7 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
 
   return (
     <motion.div
-      className="hs-root screen--home"
+      className={`hs-root screen--home${theme === 'pipboy' ? ' hs-root--pipboy' : ''}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.35, ease: 'easeOut' }}
@@ -121,7 +131,9 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
             <Settings size={20} />
           </button>
         </div>
-        <div className="hs-header__title">ShieldVault</div>
+        <div className="hs-header__title">
+          {theme === 'pipboy' ? 'STAT' : 'ShieldVault'}
+        </div>
         <div className="hs-header__right">
           <div className="hs-avatar">SV</div>
         </div>
@@ -129,6 +141,15 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
 
       {/* Scrollable content */}
       <div className="hs-scroll">
+        {theme === 'pipboy' && (
+          <div className="hs-pipboy-status">
+            <div className="hs-pipboy-status__row">
+              <span>LVL 06</span>
+              <span>HP 115/115</span>
+              <span>AP 90/90</span>
+            </div>
+          </div>
+        )}
 
         {/* Balance — flat, no card */}
         <div className="hs-balance-section">
@@ -161,6 +182,21 @@ export function HomeScreen({ onReset }: { onReset?: () => void }) {
             Receive
           </button>
         </div>
+
+        {theme === 'pipboy' && (
+          <div className="hs-section">
+            <div className="hs-pipboy-card-unlock">
+              <PipboyMissionCard className="hs-pipboy-card-unlock__card" />
+              <button
+                className="hs-pipboy-switch"
+                onClick={() => onThemeChange?.('standard')}
+              >
+                <RotateCcw size={14} />
+                Standard mode
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Yield section */}
         <div className="hs-section">

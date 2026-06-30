@@ -9,6 +9,13 @@ import { GameOnboardingFlow } from './flows/onboarding/GameOnboardingFlow'
 import './App.css'
 import './styles/game-mode.css'
 
+const VARIANT_ENTRY_KEY = 'shieldvault_variant_entry'
+const PIPBOY_SKIN_KEY = 'shieldvault_pipboy_skin_unlocked'
+const ACTIVE_THEME_KEY = 'shieldvault_active_theme'
+const CARD_SKIN_KEY = 'shieldvault_card_skin'
+
+type AppTheme = 'standard' | 'pipboy'
+
 function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMode: () => void }) {
   return (
     <motion.div
@@ -71,14 +78,32 @@ function LandingScreen({ onStart, onGameMode }: { onStart: () => void; onGameMod
 export default function App() {
   const onboarding = useOnboarding()
   const [gameMode, setGameMode] = useState(false)
+  const [activeTheme, setActiveTheme] = useState<AppTheme>(() => {
+    return localStorage.getItem(ACTIVE_THEME_KEY) === 'pipboy' ? 'pipboy' : 'standard'
+  })
+
+  const setTheme = (theme: AppTheme) => {
+    localStorage.setItem(ACTIVE_THEME_KEY, theme)
+    setActiveTheme(theme)
+  }
 
   const handleGameComplete = () => {
+    localStorage.setItem(VARIANT_ENTRY_KEY, 'pipboy')
+    localStorage.setItem(PIPBOY_SKIN_KEY, '1')
+    localStorage.setItem(CARD_SKIN_KEY, 'pipboy')
+    localStorage.setItem(ACTIVE_THEME_KEY, 'pipboy')
+    setActiveTheme('pipboy')
     setGameMode(false)
     onboarding.advance('completed')
   }
 
   const handleReset = () => {
     setGameMode(false)
+    localStorage.removeItem(VARIANT_ENTRY_KEY)
+    localStorage.removeItem(PIPBOY_SKIN_KEY)
+    localStorage.removeItem(ACTIVE_THEME_KEY)
+    localStorage.removeItem(CARD_SKIN_KEY)
+    setActiveTheme('standard')
     onboarding.reset()
   }
 
@@ -86,7 +111,12 @@ export default function App() {
     <MobileShell>
       <div className="app-layer">
         {onboarding.isComplete ? (
-          <HomeScreen key="home" onReset={handleReset} />
+          <HomeScreen
+            key="home"
+            theme={activeTheme}
+            onThemeChange={setTheme}
+            onReset={handleReset}
+          />
         ) : gameMode ? (
           <GameOnboardingFlow key="game" onComplete={handleGameComplete} />
         ) : onboarding.isActive ? (
