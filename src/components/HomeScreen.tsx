@@ -5,7 +5,6 @@ import {
   Settings, Home, TrendingUp, CreditCard, User,
   ChevronRight,
 } from 'lucide-react'
-import { Button } from './Button'
 import { EarnScreen, EARN_PROVIDERS } from './EarnScreen'
 
 const YIELD_KEY = 'shieldvault_yield_provider'

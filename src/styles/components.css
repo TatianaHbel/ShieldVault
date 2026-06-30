@@ -2487,7 +2487,7 @@
 .onb-body {
   flex: 1;
   overflow-y: auto;
-  padding: 4px 24px 8px;
+  padding: 16px 24px 24px;
   overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -3204,10 +3204,11 @@
 }
 
 .onb-choice-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px;
+  padding: 18px 16px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-xl);
   background: var(--color-surface);
@@ -3215,6 +3216,7 @@
   text-align: left;
   -webkit-tap-highlight-color: transparent;
   transition: border-color var(--duration-fast), background var(--duration-fast);
+  width: 100%;
 }
 
 .onb-choice-card:active { background: var(--color-surface-raised); }
@@ -3710,7 +3712,7 @@
 /* ── Balance section ───────────────────── */
 
 .hs-balance-section {
-  padding: 8px 16px 0;
+  padding: 32px 24px 0;
 }
 
 .hs-balance-label {
@@ -3718,17 +3720,17 @@
   font-weight: 500;
   color: var(--color-muted);
   font-family: var(--font-body);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .hs-balance-amount {
-  font-size: 40px;
+  font-size: 44px;
   font-weight: 700;
   color: var(--color-ink);
   letter-spacing: -0.04em;
   font-family: var(--font-body);
   line-height: 1;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
   font-variant-numeric: tabular-nums;
   display: flex;
   align-items: baseline;
@@ -3736,7 +3738,7 @@
 }
 
 .hs-balance-unit {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 500;
   color: var(--color-muted);
   letter-spacing: 0.02em;
@@ -3759,7 +3761,7 @@
 /* ── Action pill buttons ───────────────── */
 
 .hs-action-pills {
-  padding: 4px 16px 8px;
+  padding: 18px 24px 24px;
   display: flex;
   gap: 8px;
 }
@@ -3796,7 +3798,7 @@
 /* ── Generic section ───────────────────── */
 
 .hs-section {
-  padding: 16px 20px 0;
+  padding: 20px 24px 0;
 }
 
 .hs-section-header {
@@ -3905,7 +3907,7 @@
   color: var(--color-on-primary);
   border: none;
   border-radius: var(--radius-full);
-  padding: 10px 18px;
+  padding: 12px 20px;
   font-size: 14px;
   font-weight: 700;
   font-family: var(--font-body);
@@ -3925,7 +3927,7 @@
   background: var(--color-surface-card);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-xl);
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -4165,6 +4167,87 @@
 }
 
 /* ── Onboarding yield teaser ───────────── */
+
+/* ── Earn note (inline, replaces yield teaser on funding screen) ── */
+
+.onb-earn-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 12px 14px;
+  background: rgba(232, 201, 58, 0.06);
+  border: 1px solid rgba(232, 201, 58, 0.14);
+  border-radius: var(--radius-md);
+}
+
+.onb-earn-note__icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.onb-earn-note span {
+  font-size: 13px;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+.onb-earn-note strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ── Section labels (Chime-style grouping) ─── */
+
+.onb-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.onb-section-label--gap {
+  margin-top: 20px;
+}
+
+/* ── Featured choice card (recommended) ─────── */
+
+.onb-choice-card--featured {
+  border-color: rgba(232, 201, 58, 0.3);
+  background: rgba(232, 201, 58, 0.04);
+}
+
+.onb-choice-card--featured:active {
+  background: rgba(232, 201, 58, 0.08);
+}
+
+.onb-choice-icon--gold {
+  background: rgba(232, 201, 58, 0.12);
+  color: var(--color-primary);
+}
+
+/* ── Inline badge — absolute top-right of card ── */
+
+.onb-choice-badge {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-on-primary);
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 3px 8px;
+  line-height: 1.5;
+}
+
+/* ── Legacy yield teaser (kept for other screens) ── */
 
 .onb-yield-teaser {
   display: flex;

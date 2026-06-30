@@ -750,7 +750,6 @@ function StepTos({ onNext }: { onNext: () => void }) {
 function StepFunding({
   onCrypto,
   onFiat,
-
 }: {
   onCrypto: () => void
   onFiat: () => void
@@ -758,42 +757,30 @@ function StepFunding({
   return (
     <motion.div className="onb-screen" {...SLIDE}>
       <div className="onb-body">
-        <h2 className="onb-title">Deposit to activate</h2>
+        <h2 className="onb-title">How would you like to fund your account?</h2>
         <p className="onb-sub">
           Your $50 goes straight to your balance. {"It's"} a deposit, not a fee.
-          Once {"you're"} in, you choose how it grows.
         </p>
-
-        <div className="onb-yield-teaser">
-          <div className="onb-yield-teaser__icon">
-            <TrendingUp size={16} />
-          </div>
-          <div className="onb-yield-teaser__body">
-            <div className="onb-yield-teaser__line">
-              Your balance can earn <strong>up to 6.2% APY</strong>
-            </div>
-            <div className="onb-yield-teaser__sub">
-              You choose your provider once {"you're"} inside
-            </div>
-          </div>
-        </div>
 
         <div className="onb-choices">
           <button className="onb-choice-card" onClick={onCrypto}>
+            <span className="onb-choice-badge">Instant</span>
             <div className="onb-choice-icon">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-                <path d="M9.5 14.5c0 1.1.9 2 2 2h2a2 2 0 000-4h-2a2 2 0 010-4h2a2 2 0 012 2M12 7v1m0 8v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+                <path d="M12 7v4l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="12" cy="15" r="1" fill="currentColor" />
               </svg>
             </div>
             <div className="onb-choice-body">
               <div className="onb-choice-title">Send crypto</div>
-              <div className="onb-choice-sub">Deposit USDC or any other crypto</div>
+              <div className="onb-choice-sub">Transfer USDC or any other crypto directly</div>
             </div>
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+
           <button className="onb-choice-card" onClick={onFiat}>
             <div className="onb-choice-icon">
               <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
@@ -810,6 +797,15 @@ function StepFunding({
               <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
+        </div>
+
+        <div className="onb-earn-note">
+          <TrendingUp size={13} className="onb-earn-note__icon" />
+          <span>
+            {"Your $50 won't sit idle. It earns up to "}
+            <strong>6.2% APY</strong>
+            {" automatically. Pick your Earn vault once you're inside."}
+          </span>
         </div>
       </div>
     </motion.div>
